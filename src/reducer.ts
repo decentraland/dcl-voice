@@ -3,12 +3,20 @@ import {
   ADD_REMOTE_STREAM,
   RECONNECT_VOICE,
   REMOVE_REMOTE_STREAM,
+  SET_CONFIG,
+  SET_ERROR,
   SET_LOCAL_STREAM,
+  START_VOICE,
   VoiceActions,
   VOICE_INITIALIZED
 } from './actions'
 
 const VOICE_INITIAL_STATE: VoiceState = {
+  config: {
+    pingInterval: 1000 * 60,
+    retryTimes: 10,
+    url: ''
+  },
   connected: false,
   remoteStreams: [],
   localStream: undefined,
@@ -29,7 +37,15 @@ export function voiceReducer(
         signal: action.payload.signal,
         connected: true,
         reconnectTimes: 0,
-        remoteStreams: []
+        remoteStreams: [],
+        error: undefined
+      }
+    }
+
+    case START_VOICE: {
+      return {
+        ...state,
+        config: { ...state.config, ...action.payload.config }
       }
     }
 
@@ -37,6 +53,21 @@ export function voiceReducer(
       return {
         ...state,
         reconnectTimes: state.reconnectTimes + 1
+      }
+    }
+
+    case SET_CONFIG: {
+      return {
+        ...state,
+        config: { ...state.config, ...action.payload.config }
+      }
+    }
+
+    case SET_ERROR: {
+      console.error(action.payload.error)
+      return {
+        ...state,
+        error: action.payload.error
       }
     }
 

@@ -9,14 +9,14 @@ import {
   JOIN_ROOM
 } from '../actions'
 import { joinRoom } from './joinRoom'
-import { initializeVoiceSaga } from './signalConnection'
+import { startVoiceSaga } from './signalConnection'
 import { streamLocalVoice } from './streamLocalVoice'
 import { reconnectVoice } from './reconnectVoice'
 import { voiceStream } from './voice-stream'
 
 export function* voiceSaga() {
   // Initalize sfu ws => call joinRoom to join default island.
-  yield takeEvery(START_VOICE, initializeVoiceSaga)
+  yield takeEvery(START_VOICE, startVoiceSaga)
 
   // Leave current room and join the island room
   yield takeEvery(JOIN_ROOM, joinRoom)

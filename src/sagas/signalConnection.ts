@@ -1,6 +1,6 @@
 import { Client } from 'ion-sdk-js'
 import { IonSFUJSONRPCSignal } from 'ion-sdk-js/lib/signal/json-rpc-impl'
-import { put, call, take } from 'redux-saga/effects'
+import { put, call, take, select } from 'redux-saga/effects'
 import { EventChannel, eventChannel } from 'redux-saga'
 
 import {
@@ -8,19 +8,17 @@ import {
   addRemoteStream,
   removeRemoteStream,
   VoiceActions,
-  reconnectVoice
+  reconnectVoice,
+  setError
 } from '../actions'
 import { VoiceState } from '../types'
+import { getConfig } from '../selectors'
 
 type SignalConnection = Required<Pick<VoiceState, 'signal' | 'client'>>
 
-// TODO remove constants
-const ONE_MIMNUTE = 1000 * 60
-const URL = 'wss://test-sfu.decentraland.zone/ws'
-
-function createSignalConnection() {
+function createSignalConnection(url: string) {
   return new Promise<SignalConnection>((resolve, reject) => {
-    const signal = new IonSFUJSONRPCSignal(URL)
+    const signal = new IonSFUJSONRPCSignal(url)
     const client = new Client(signal)
 
     signal.onerror = (event) => {
@@ -33,11 +31,11 @@ function createSignalConnection() {
   })
 }
 
-function createSocketChannel({ client, signal }: SignalConnection) {
+function createSocketChannel({ client, signal }: SignalConnection, pingInterval: number) {
   return eventChannel<VoiceActions | Error>((emit) => {
     // Keep Alive functionality
     let interval: NodeJS.Timeout
-    interval = setInterval(() => signal.notify('', ''), ONE_MIMNUTE)
+    interval = setInterval(() => signal.notify('', ''), pingInterval)
 
     // Read remote streams
     client.ontrack = (track, stream) => {
@@ -75,14 +73,23 @@ function createSocketChannel({ client, signal }: SignalConnection) {
   })
 }
 
-export function* initializeVoiceSaga() {
+export function* startVoiceSaga() {
   try {
+    console.log('saga voice')
+    const config: ReturnType<typeof getConfig> = yield select(getConfig)
+    if (!config.url) {
+      yield put(setError('ws url missing'))
+      return
+    }
+
     const { client, signal }: SignalConnection = yield call(
-      createSignalConnection
+      createSignalConnection,
+      config.url
     )
     const socketChannel: EventChannel<VoiceActions> = yield call(
       createSocketChannel,
-      { client, signal }
+      { client, signal },
+      config.pingInterval
     )
 
     yield put(voiceInitialized(signal, client))
@@ -90,18 +97,21 @@ export function* initializeVoiceSaga() {
     while (true) {
       try {
         const payload: VoiceActions = yield take(socketChannel)
-        console.log({ payload })
         yield put(payload)
       } catch (error) {
         // tslint:disable-next-line: no-console
-        console.log('Channel error:', error)
+        console.error('Channel error:', error)
         socketChannel.close()
         throw error
       }
     }
   } catch (error) {
+    const errorMessage = (error as Error).message
+    || (error as Error).name
+    || error as string
     // tslint:disable-next-line: no-console
-    console.log('Voice Saga:', error)
+    console.error('Voice Saga:', error)
+    yield put(setError(errorMessage))
     yield put(reconnectVoice())
   }
 }

@@ -19,3 +19,7 @@ export const getLocalStream = (
 export const getConnected = (
   store: RootVoiceState
 ) => store.voice.connected
+
+export const getConfig = (
+  store: RootVoiceState
+) => store.voice.config
