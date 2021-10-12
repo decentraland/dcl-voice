@@ -1,6 +1,12 @@
 {
-  "extends": ["dcl-tslint-config-standard"],
+  "extends": ["dcl-tslint-config-standard", "tslint-plugin-prettier"],
   "linterOptions": {
     "exclude": ["test/**/*.ts"]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "none"
   }
 }

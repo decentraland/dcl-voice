@@ -1,5 +1,5 @@
 {
-  "name": "@dcl/voice-chat",
+  "name": "@dcl/voice",
   "version": "1.0.0",
   "description": "Voice WebRTC sfu sagas",
   "main": "dist/index.js",
@@ -19,11 +19,6 @@
   "bugs": {
     "url": "https://github.com/decentraland/dcl-voice/issues"
   },
-  "prettier": {
-    "printWidth": 80,
-    "semi": false,
-    "singleQuote": true
-  },
   "engines": {
     "npm": "^7.0.0"
   },
@@ -32,8 +27,10 @@
     "@types/jest": "^27.0.1",
     "dcl-tslint-config-standard": "^3.0.0",
     "jest": "^27.0.6",
+    "prettier": "^2.4.1",
     "ts-jest": "^27.0.5",
     "tslint": "^5.20.1",
+    "tslint-plugin-prettier": "^2.3.0",
     "typescript": "^4.3.5"
   },
   "dependencies": {
