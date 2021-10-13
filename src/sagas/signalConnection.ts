@@ -75,7 +75,6 @@ function createSocketChannel({ client, signal }: SignalConnection, pingInterval:
 
 export function* startVoiceSaga() {
   try {
-    console.log('saga voice')
     const config: ReturnType<typeof getConfig> = yield select(getConfig)
     if (!config.url) {
       yield put(setError('ws url missing'))
@@ -107,8 +106,8 @@ export function* startVoiceSaga() {
     }
   } catch (error) {
     const errorMessage = (error as Error).message
-    || (error as Error).name
-    || error as string
+      || (error as Error).name
+      || error as string
     // tslint:disable-next-line: no-console
     console.error('Voice Saga:', error)
     yield put(setError(errorMessage))

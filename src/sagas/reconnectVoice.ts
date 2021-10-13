@@ -10,7 +10,6 @@ export function* reconnectVoice() {
   const { retryTimes }: ReturnType<typeof getConfig> = yield select(getConfig)
 
   if (reconnectTimes > retryTimes) {
-    // TODO: Do something when we cannot reconnect to the socket
     const error = 'Max amount of retries. Socket disconnected'
     yield put(setError(error))
     return

@@ -1,47 +1,5 @@
-import { RemoteStream } from 'ion-sdk-js'
-
-type Cache = {
-  streams: Record<
-    string,
-    { audio: HTMLAudioElement, node: MediaStreamAudioSourceNode } | undefined
-  >
-  audioContext: AudioContext | undefined
-  gainNode: GainNode | undefined
-}
-
-const cache: Cache = {
-  audioContext: undefined,
-  gainNode: undefined,
-  streams: {}
-}
-
-const getValue = <T extends keyof Cache>(
-  key: T
-): Cache[T] => cache[key]
-
-const setValue = <T extends keyof Cache>(
-  key: T,
-  value: Cache[T]
-): Cache[T] => cache[key] = value
-
-const setValue2 = <
-  T extends keyof Cache,
-  K extends keyof Cache[T]
->(key: T, key2: K, value: Cache[T][K]) => (cache[key] as any)[key2] = value
-
-const getContext = () => {
-  const context = getValue('audioContext') || setValue('audioContext', new AudioContext())!
-  const gainNode = getValue('gainNode')
-
-  if (gainNode && context) {
-    return { context, gainNode }
-  }
-
-  const newGainNode = setValue('gainNode', new GainNode(context))!
-  newGainNode.connect(context.destination)
-
-  return { context, gainNode: newGainNode }
-}
+import { LocalStream, RemoteStream } from 'ion-sdk-js'
+import { getValue, getContext, isChrome, isNotUndefined, setValue2 } from './utils'
 
 export function removeVoiceStream(streamId: string) {
   const stream = getValue('streams')[streamId]
@@ -50,28 +8,49 @@ export function removeVoiceStream(streamId: string) {
     return
   }
 
-  stream.audio.srcObject = null
-  stream.audio.remove()
-  stream.node.disconnect()
-
+  stream.stream.disconnect()
+  stream.gain.disconnect()
   setValue2('streams', streamId, undefined)
 }
 
 export function addVoiceStream(streams: RemoteStream[]) {
-  const { context, gainNode } = getContext()
+  const context = getContext()
   const oldStreams = getValue('streams')
 
-  streams.forEach((stream) => {
-    const prevStream = oldStreams[stream.id]
-    if (prevStream) return
+  return streams
+    .map((stream) => {
+      const prevStream = oldStreams[stream.id]
 
-    const streamNode = context.createMediaStreamSource(stream)
-    streamNode.connect(gainNode)
+      if (prevStream) {
+        prevStream.gain.disconnect()
+        prevStream.stream.disconnect()
+      }
 
-    const audio = new Audio()
-    audio.muted = true
-    audio.srcObject = stream
+      const streamNode = context.createMediaStreamSource(stream)
+      const gainNode = context.createGain()
 
-    setValue2('streams', stream.id, { audio, node: streamNode })
-  })
+      streamNode.connect(gainNode)
+      gainNode.connect(context.destination)
+
+      if (isChrome()) {
+        // chrome needs an audio or an html tag to play sound.
+        const audio = new Audio()
+        audio.srcObject = streamNode.mediaStream
+        audio.muted = true
+      }
+
+      const value = { stream: streamNode, gain: gainNode }
+      setValue2('streams', stream.id, value)
+
+      return value
+    })
+    .filter(isNotUndefined)
+}
+
+// Add local stream muted to initialize AudioContext.
+// Then we cache that AudioContext and append all the streams.
+// Workaround for browsers that need a click in order to play some sound
+export function initVoiceContext(localStream: LocalStream) {
+  const [stream] = addVoiceStream([localStream as any as RemoteStream])
+  stream.gain.gain.value = 0
 }

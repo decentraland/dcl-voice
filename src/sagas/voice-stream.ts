@@ -1,11 +1,17 @@
 import { select, call } from 'redux-saga/effects'
 import { RemoteStream } from 'ion-sdk-js'
 
-import { AddRemoteStream, RemoveRemoteStream, REMOVE_REMOTE_STREAM } from '../actions'
+import { AddRemoteStream, RemoveRemoteStream, REMOVE_REMOTE_STREAM, SetLocalStream } from '../actions'
 import { getRemoteStreams } from '../selectors'
 import { addVoiceStream, removeVoiceStream } from '../'
+import { isContextDefined } from '../utils'
 
-export function* voiceStream(action: AddRemoteStream | RemoveRemoteStream) {
+type Action = AddRemoteStream | RemoveRemoteStream | SetLocalStream
+export function* voiceStream(action: Action) {
+  if (!isContextDefined()) {
+    return
+  }
+
   if (action.type === REMOVE_REMOTE_STREAM) {
     yield call(() => removeVoiceStream(action.payload.streamId))
     return

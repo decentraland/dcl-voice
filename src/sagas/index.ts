@@ -6,7 +6,8 @@ import {
   REMOVE_REMOTE_STREAM,
   START_LOCAL_STREAM,
   START_VOICE,
-  JOIN_ROOM
+  JOIN_ROOM,
+  SET_LOCAL_STREAM
 } from '../actions'
 import { joinRoom } from './joinRoom'
 import { startVoiceSaga } from './signalConnection'
@@ -30,4 +31,5 @@ export function* voiceSaga() {
   // Start/Stop streams
   yield takeEvery(ADD_REMOTE_STREAM, voiceStream)
   yield takeEvery(REMOVE_REMOTE_STREAM, voiceStream)
+  yield takeEvery(SET_LOCAL_STREAM, voiceStream)
 }

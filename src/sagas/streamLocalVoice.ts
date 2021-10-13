@@ -3,6 +3,7 @@ import { Client, LocalStream, Constraints } from 'ion-sdk-js'
 
 import { setLocalStream } from '../actions'
 import { getClient } from '../selectors'
+import { initVoiceContext } from '..'
 
 export function* streamLocalVoice() {
   const client: Client = yield select(getClient)
@@ -15,6 +16,8 @@ export function* streamLocalVoice() {
     sendEmptyOnMute: true
   }
   const localStream: LocalStream = yield call(LocalStream.getUserMedia, options)
+  initVoiceContext(localStream)
+
   yield call(() => client.publish(localStream))
   yield put(setLocalStream(localStream))
 }
