@@ -15,7 +15,7 @@ export function* streamLocalVoice() {
     video: false,
     simulcast: true,
     sendEmptyOnMute: true,
-    advanced: [{ echoCancellation: true }, { autoGainControl: true }, { noiseSuppression: true }] as any
+    advanced: [{ echoCancellation: true }, { autoGainControl: true }, { noiseSuppression: true }]
   } as any as Constraints
 
   const localStream: LocalStream = yield call(LocalStream.getUserMedia, options)

@@ -3,7 +3,7 @@ const AudioContext = (window as any).webkitAudioContext || window.AudioContext
 type Cache = {
   streams: Record<
     string,
-    { stream: MediaStreamAudioSourceNode, gain: GainNode } | undefined
+    { stream: MediaStreamAudioSourceNode, gain: GainNode, audio?: HTMLAudioElement } | undefined
   >
   audioContext: AudioContext | undefined
   mapping: Record<string, string>

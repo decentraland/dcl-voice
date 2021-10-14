@@ -10,6 +10,11 @@ export function removeVoiceStream(streamId: string) {
 
   stream.stream.disconnect()
   stream.gain.disconnect()
+  if (stream.audio) {
+    stream.audio.srcObject = null
+    stream.audio.pause()
+    stream.audio.currentTime = 0
+  }
   setValue2('streams', streamId, undefined)
 }
 
@@ -22,8 +27,7 @@ export function addVoiceStream(streams: RemoteStream[]) {
       const prevStream = oldStreams[stream.id]
 
       if (prevStream) {
-        prevStream.gain.disconnect()
-        prevStream.stream.disconnect()
+        return prevStream
       }
 
       const streamNode = context.createMediaStreamSource(stream)
@@ -32,15 +36,16 @@ export function addVoiceStream(streams: RemoteStream[]) {
       streamNode.connect(gainNode)
       gainNode.connect(context.destination)
 
+      let audio: HTMLAudioElement | undefined
       if (isChrome()) {
         // TODO createMediaStreamDestination
         // chrome needs an audio or an html tag to play sound.
-        const audio = new Audio()
+        audio = new Audio()
         audio.srcObject = streamNode.mediaStream
         audio.muted = true
       }
 
-      const value = { stream: streamNode, gain: gainNode }
+      const value = { stream: streamNode, gain: gainNode, audio }
       setValue2('streams', stream.id, value)
 
       return value
