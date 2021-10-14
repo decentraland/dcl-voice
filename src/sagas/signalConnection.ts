@@ -1,5 +1,5 @@
-import { Client } from 'ion-sdk-js'
-import { IonSFUJSONRPCSignal } from 'ion-sdk-js/lib/signal/json-rpc-impl'
+import { Client } from '@dcl/ion-sdk-js'
+import { IonSFUJSONRPCSignal } from '@dcl/ion-sdk-js/lib/signal/json-rpc-impl'
 import { put, call, take, select } from 'redux-saga/effects'
 import { EventChannel, eventChannel } from 'redux-saga'
 
@@ -13,6 +13,7 @@ import {
 } from '../actions'
 import { VoiceState } from '../types'
 import { getConfig } from '../selectors'
+import { listenDataChannel } from '../dataChannel'
 
 type SignalConnection = Required<Pick<VoiceState, 'signal' | 'client'>>
 
@@ -37,9 +38,14 @@ function createSocketChannel({ client, signal }: SignalConnection, pingInterval:
     let interval: NodeJS.Timeout
     interval = setInterval(() => signal.notify('', ''), pingInterval)
 
+    client.ondatachannel = ({ channel }) => {
+      if (channel.label === 'data') {
+        listenDataChannel(channel, 'onDataChannel')
+      }
+    }
+
     // Read remote streams
     client.ontrack = (track, stream) => {
-      console.log({ track, stream })
       track.onunmute = () => {
         // Send to th socketChannel ADD_REMOTE_STREAM action
         emit(addRemoteStream(stream))

@@ -1,9 +1,10 @@
 import { select, call, put } from 'redux-saga/effects'
-import { Client, LocalStream, Constraints } from 'ion-sdk-js'
+import { Client, LocalStream, Constraints } from '@dcl/ion-sdk-js'
 
 import { setLocalStream } from '../actions'
 import { getClient } from '../selectors'
 import { initVoiceContext } from '..'
+import { listenDataChannel, setUser } from '../dataChannel'
 
 export function* streamLocalVoice() {
   const client: Client = yield select(getClient)
@@ -15,9 +16,14 @@ export function* streamLocalVoice() {
     simulcast: true,
     sendEmptyOnMute: true
   }
+
   const localStream: LocalStream = yield call(LocalStream.getUserMedia, options)
+  setUser({ id: window.location.search, streamId: localStream.id })
   initVoiceContext(localStream)
 
   yield call(() => client.publish(localStream))
   yield put(setLocalStream(localStream))
+
+  const channel = client.createDataChannel('data')
+  listenDataChannel(channel, 'create')
 }

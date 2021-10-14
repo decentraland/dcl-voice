@@ -6,11 +6,13 @@ type Cache = {
     { stream: MediaStreamAudioSourceNode, gain: GainNode } | undefined
   >
   audioContext: AudioContext | undefined
+  mapping: Record<string, string>
 }
 
 const cache: Cache = {
   audioContext: undefined,
-  streams: {}
+  streams: {},
+  mapping: {}
 }
 
 export function getValue<T extends keyof Cache>(

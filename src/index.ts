@@ -1,4 +1,4 @@
-import { LocalStream, RemoteStream } from 'ion-sdk-js'
+import { LocalStream, RemoteStream } from '@dcl/ion-sdk-js'
 import { getValue, getContext, isChrome, isNotUndefined, setValue2 } from './utils'
 
 export function removeVoiceStream(streamId: string) {
@@ -33,6 +33,7 @@ export function addVoiceStream(streams: RemoteStream[]) {
       gainNode.connect(context.destination)
 
       if (isChrome()) {
+        // TODO createMediaStreamDestination
         // chrome needs an audio or an html tag to play sound.
         const audio = new Audio()
         audio.srcObject = streamNode.mediaStream

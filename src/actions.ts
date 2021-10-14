@@ -1,6 +1,6 @@
-import { Client, RemoteStream, LocalStream } from 'ion-sdk-js'
+import { Client, RemoteStream, LocalStream } from '@dcl/ion-sdk-js'
 import { action } from 'typesafe-actions'
-import { IonSFUJSONRPCSignal } from 'ion-sdk-js/lib/signal/json-rpc-impl'
+import { IonSFUJSONRPCSignal } from '@dcl/ion-sdk-js/lib/signal/json-rpc-impl'
 
 import { VoiceState } from './types'
 
@@ -17,6 +17,10 @@ export const voiceInitialized = (
 ) => action(VOICE_INITIALIZED, { client, signal })
 export type VoiceInitialized = ReturnType<typeof voiceInitialized>
 
+export const JOIN_ROOM = 'Join voice room'
+export const joinRoom = (roomId: string, userId: string) => action(JOIN_ROOM, { roomId, userId })
+export type JoinRoom = ReturnType<typeof joinRoom>
+
 export const SET_CONFIG = 'Voice set config'
 export const setConfig = (
   config: Partial<VoiceState['config']>
@@ -31,9 +35,10 @@ export const RECONNECT_VOICE = 'Reconnect voice'
 export const reconnectVoice = () => action(RECONNECT_VOICE)
 export type ReconnectVoice = ReturnType<typeof reconnectVoice>
 
-export const JOIN_ROOM = 'Join voice room'
-export const joinRoom = (roomId: string, userId: string) => action(JOIN_ROOM, { roomId, userId })
-export type JoinRoom = ReturnType<typeof joinRoom>
+// MANAGE STREAMS
+export const START_LOCAL_STREAM = 'Start local stream'
+export const startLocalStream = () => action(START_LOCAL_STREAM)
+export type StartLocalStream = ReturnType<typeof startLocalStream>
 
 export const SET_LOCAL_STREAM = 'Set local stream'
 export const setLocalStream = (
@@ -52,10 +57,6 @@ export const removeRemoteStream = (
   streamId: string
 ) => action(REMOVE_REMOTE_STREAM, { streamId })
 export type RemoveRemoteStream = ReturnType<typeof removeRemoteStream>
-
-export const START_LOCAL_STREAM = 'Start local stream'
-export const startLocalStream = () => action(START_LOCAL_STREAM)
-export type StartLocalStream = ReturnType<typeof startLocalStream>
 
 export type VoiceActions =
   | StartVoice
