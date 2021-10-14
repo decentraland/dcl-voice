@@ -1,5 +1,8 @@
+// tslint:disable: no-commented-out-code
+
 import { LocalStream, RemoteStream } from '@dcl/ion-sdk-js'
-import { getValue, getContext, isChrome, isNotUndefined, setValue2 } from './utils'
+import { getValue, getContext, isChrome, setValue2, getDestination } from './utils'
+import { startLoopback } from './loopback'
 
 export function removeVoiceStream(streamId: string) {
   const stream = getValue('streams')[streamId]
@@ -18,45 +21,56 @@ export function removeVoiceStream(streamId: string) {
   setValue2('streams', streamId, undefined)
 }
 
-export function addVoiceStream(streams: RemoteStream[], isLocal?: boolean) {
+export async function addVoiceStream(streams: RemoteStream[], isLocal?: boolean) {
   const context = getContext()
+  const destination = getDestination()
   const oldStreams = getValue('streams')
 
-  return streams
-    .map((stream) => {
-      const prevStream = oldStreams[stream.id]
+  streams.forEach(async (stream) => {
+    const prevStream = oldStreams[stream.id]
 
-      if (prevStream) {
-        return prevStream
-      }
+    if (prevStream) {
+      return prevStream
+    }
 
-      const streamNode = context.createMediaStreamSource(stream)
-      const gainNode = context.createGain()
+    const streamNode = context.createMediaStreamSource(stream)
+    const gainNode = context.createGain()
+    streamNode.connect(gainNode)
+    gainNode.connect(destination)
+    let audio: HTMLAudioElement | undefined
 
-      streamNode.connect(gainNode)
-      gainNode.connect(context.destination)
+    if (isChrome()) {
+      // audio = new Audio()
+      // audio.muted = true
+      // audio.srcObject = streamNode.mediaStream
+    }
 
-      let audio: HTMLAudioElement | undefined
-      if (isChrome() && !isLocal) {
-        // TODO createMediaStreamDestination
-        // chrome needs an audio or an html tag to play sound.
-        audio = new Audio()
-        audio.muted = true
-        audio.srcObject = streamNode.mediaStream
-      }
+    setValue2(
+      'streams',
+      stream.id,
+      { gain: gainNode, stream: streamNode, audio }
+    )
+  })
 
-      const value = { stream: streamNode, gain: gainNode, audio }
-      setValue2('streams', stream.id, value)
-
-      return value
-    })
-    .filter(isNotUndefined)
+  const loopback = await startLoopback(destination.stream)
+  const audio = new Audio()
+  audio.autoplay = true
+  audio.srcObject = loopback
+  audio.volume = 1
+  // tslint:disable-next-line: no-floating-promises
+  audio.play()
 }
 
 // Add local stream muted to initialize AudioContext.
 // Then we cache that AudioContext and append all the streams.
 // Workaround for browsers that need a click in order to play some sound
 export function initVoiceContext(localStream: LocalStream) {
-  const [stream] = addVoiceStream([localStream as any as RemoteStream], true)
-  stream.gain.gain.value = 0
+  const context = getContext()
+  const destination = getDestination()
+  const stream = context.createMediaStreamSource(localStream)
+  const gain = context.createGain()
+  gain.gain.value = 0
+  stream.connect(gain).connect(destination)
+  // tslint:disable-next-line: no-floating-promises
+  // addVoiceStream([localStream as any as RemoteStream], true)
 }

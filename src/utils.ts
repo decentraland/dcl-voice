@@ -7,12 +7,14 @@ type Cache = {
   >
   audioContext: AudioContext | undefined
   mapping: Record<string, string>
+  destination: MediaStreamAudioDestinationNode | undefined
 }
 
 const cache: Cache = {
   audioContext: undefined,
   streams: {},
-  mapping: {}
+  mapping: {},
+  destination: undefined
 }
 
 export function getValue<T extends keyof Cache>(
@@ -43,6 +45,14 @@ export function getContext() {
   const context = getValue('audioContext')
     || setValue('audioContext', new AudioContext())!
   return context
+}
+
+export function getDestination() {
+  const destination = getValue('destination')
+  if (destination) return destination
+
+  const context = getContext()
+  return setValue('destination', context.createMediaStreamDestination())!
 }
 
 export function isNotUndefined<T>(value: T | undefined): value is T {
