@@ -1,0 +1,4 @@
+dist
+**/node_modules
+test-app/build
+**/*.d.ts

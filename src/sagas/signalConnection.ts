@@ -32,11 +32,16 @@ function createSignalConnection(url: string) {
   })
 }
 
-function createSocketChannel({ client, signal }: SignalConnection, pingInterval: number) {
+function createSocketChannel(
+  { client, signal }: SignalConnection,
+  pingInterval: number
+) {
   return eventChannel<VoiceActions | Error>((emit) => {
     // Keep Alive functionality
-    let interval: NodeJS.Timeout
-    interval = setInterval(() => signal.notify('', ''), pingInterval)
+    const interval: NodeJS.Timeout = setInterval(
+      () => signal.notify('', ''),
+      pingInterval
+    )
 
     client.ondatachannel = ({ channel }) => {
       if (channel.label === 'data') {
@@ -111,9 +116,8 @@ export function* startVoiceSaga() {
       }
     }
   } catch (error) {
-    const errorMessage = (error as Error).message
-      || (error as Error).name
-      || error as string
+    const errorMessage =
+      (error as Error).message || (error as Error).name || (error as string)
     // tslint:disable-next-line: no-console
     console.error('Voice Saga:', error)
     yield put(setError(errorMessage))

@@ -36,6 +36,9 @@ watch-test-app:
 	@cd test-app; npm start
 
 lint:
-	node_modules/.bin/tslint --project tsconfig.json
+	node_modules/.bin/eslint '**/*.{tsx,ts}'
+
+lint-fix:
+	node_modules/.bin/eslint '**/*.{tsx,ts}' --fix
 
 .PHONY: build test install

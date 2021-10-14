@@ -1,7 +1,11 @@
-// tslint:disable: no-commented-out-code
-
 import { LocalStream, RemoteStream } from './ion'
-import { getValue, getContext, isChrome, setValue2, getDestination } from './utils'
+import {
+  getValue,
+  getContext,
+  isChrome,
+  setValue2,
+  getDestination
+} from './utils'
 import { startLoopback } from './loopback'
 
 export function removeVoiceStream(streamId: string) {
@@ -21,7 +25,10 @@ export function removeVoiceStream(streamId: string) {
   setValue2('streams', streamId, undefined)
 }
 
-export async function addVoiceStream(streams: RemoteStream[], isLocal?: boolean) {
+export async function addVoiceStream(
+  streams: RemoteStream[],
+  _isLocal?: boolean
+) {
   const context = getContext()
   const destination = getDestination()
   const oldStreams = getValue('streams')
@@ -45,11 +52,11 @@ export async function addVoiceStream(streams: RemoteStream[], isLocal?: boolean)
       // audio.srcObject = streamNode.mediaStream
     }
 
-    setValue2(
-      'streams',
-      stream.id,
-      { gain: gainNode, stream: streamNode, audio }
-    )
+    setValue2('streams', stream.id, {
+      gain: gainNode,
+      stream: streamNode,
+      audio
+    })
   })
 
   const loopback = await startLoopback(destination.stream)
@@ -57,8 +64,7 @@ export async function addVoiceStream(streams: RemoteStream[], isLocal?: boolean)
   audio.autoplay = true
   audio.srcObject = loopback
   audio.volume = 1
-  // tslint:disable-next-line: no-floating-promises
-  audio.play()
+  await audio.play()
 }
 
 // Add local stream muted to initialize AudioContext.
@@ -71,6 +77,5 @@ export function initVoiceContext(localStream: LocalStream) {
   const gain = context.createGain()
   gain.gain.value = 0
   stream.connect(gain).connect(destination)
-  // tslint:disable-next-line: no-floating-promises
   // addVoiceStream([localStream as any as RemoteStream], true)
 }

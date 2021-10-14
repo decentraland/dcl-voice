@@ -13,16 +13,18 @@ export async function startLoopback(stream: MediaStream) {
   const rtcConnection = new RTCPeerConnection()
   const rtcLoopbackConnection = new RTCPeerConnection()
 
-  rtcConnection.onicecandidate = e =>
-    e.candidate && rtcLoopbackConnection.addIceCandidate(new RTCIceCandidate(e.candidate))
-  rtcLoopbackConnection.onicecandidate = e =>
-    e.candidate && rtcConnection.addIceCandidate(new RTCIceCandidate(e.candidate))
+  rtcConnection.onicecandidate = (e) =>
+    e.candidate &&
+    rtcLoopbackConnection.addIceCandidate(new RTCIceCandidate(e.candidate))
+  rtcLoopbackConnection.onicecandidate = (e) =>
+    e.candidate &&
+    rtcConnection.addIceCandidate(new RTCIceCandidate(e.candidate))
 
-  rtcLoopbackConnection.ontrack = e =>
-    e.streams[0].getTracks().forEach(track => loopbackStream.addTrack(track))
+  rtcLoopbackConnection.ontrack = (e) =>
+    e.streams[0].getTracks().forEach((track) => loopbackStream.addTrack(track))
 
   // setup the loopback
-  stream.getTracks().forEach(track => rtcConnection.addTrack(track, stream))
+  stream.getTracks().forEach((track) => rtcConnection.addTrack(track, stream))
 
   offer = await rtcConnection.createOffer(offerOptions)
   await rtcConnection.setLocalDescription(offer)

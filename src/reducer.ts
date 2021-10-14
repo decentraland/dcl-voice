@@ -73,10 +73,12 @@ export function voiceReducer(
 
     case ADD_REMOTE_STREAM: {
       const { stream } = action.payload
-      if (state.remoteStreams.find(s => s.id === stream.id)) {
+      if (state.remoteStreams.find((s) => s.id === stream.id)) {
         return {
           ...state,
-          remoteStreams: state.remoteStreams.map(s => s.id === stream.id ? stream : s)
+          remoteStreams: state.remoteStreams.map((s) =>
+            s.id === stream.id ? stream : s
+          )
         }
       }
 
@@ -89,7 +91,9 @@ export function voiceReducer(
     case REMOVE_REMOTE_STREAM: {
       return {
         ...state,
-        remoteStreams: state.remoteStreams.filter(stream => stream.id !== action.payload.streamId)
+        remoteStreams: state.remoteStreams.filter(
+          (stream) => stream.id !== action.payload.streamId
+        )
       }
     }
 
@@ -99,7 +103,6 @@ export function voiceReducer(
         localStream: action.payload.stream
       }
     }
-
   }
 
   return state
