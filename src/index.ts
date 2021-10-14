@@ -34,6 +34,7 @@ export function addVoiceStream(streams: RemoteStream[]) {
       const gainNode = context.createGain()
 
       streamNode.connect(gainNode)
+
       gainNode.connect(context.destination)
 
       let audio: HTMLAudioElement | undefined
@@ -57,6 +58,8 @@ export function addVoiceStream(streams: RemoteStream[]) {
 // Then we cache that AudioContext and append all the streams.
 // Workaround for browsers that need a click in order to play some sound
 export function initVoiceContext(localStream: LocalStream) {
-  const [stream] = addVoiceStream([localStream as any as RemoteStream])
-  stream.gain.gain.value = 0
+  if (!isChrome()) {
+    const [stream] = addVoiceStream([localStream as any as RemoteStream])
+    stream.gain.gain.value = 0
+  }
 }
