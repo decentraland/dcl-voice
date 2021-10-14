@@ -8,14 +8,15 @@ import { listenDataChannel, setUser } from '../dataChannel'
 
 export function* streamLocalVoice() {
   const client: Client = yield select(getClient)
-  const options: Constraints = {
+  const options = {
     resolution: 'hd',
     audio: true,
     codec: 'vp8',
     video: false,
     simulcast: true,
-    sendEmptyOnMute: true
-  }
+    sendEmptyOnMute: true,
+    advanced: [{ echoCancellation: true }, { autoGainControl: true }, { noiseSuppression: true }] as any
+  } as any as Constraints
 
   const localStream: LocalStream = yield call(LocalStream.getUserMedia, options)
   setUser({ id: window.location.search, streamId: localStream.id })
