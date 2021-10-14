@@ -18,7 +18,7 @@ export function* streamLocalVoice() {
     advanced: [{ echoCancellation: true }, { autoGainControl: true }, { noiseSuppression: true }]
   } as any as Constraints
 
-  const localStream: LocalStream = yield call(LocalStream.getUserMedia, options)
+  const localStream: LocalStream = yield call(() => LocalStream.getUserMedia(options))
   setUser({ id: window.location.search, streamId: localStream.id })
   initVoiceContext(localStream)
 

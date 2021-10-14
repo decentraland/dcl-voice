@@ -18,7 +18,7 @@ export function removeVoiceStream(streamId: string) {
   setValue2('streams', streamId, undefined)
 }
 
-export function addVoiceStream(streams: RemoteStream[]) {
+export function addVoiceStream(streams: RemoteStream[], isLocal?: boolean) {
   const context = getContext()
   const oldStreams = getValue('streams')
 
@@ -34,16 +34,15 @@ export function addVoiceStream(streams: RemoteStream[]) {
       const gainNode = context.createGain()
 
       streamNode.connect(gainNode)
-
       gainNode.connect(context.destination)
 
       let audio: HTMLAudioElement | undefined
-      if (isChrome()) {
+      if (isChrome() && !isLocal) {
         // TODO createMediaStreamDestination
         // chrome needs an audio or an html tag to play sound.
         audio = new Audio()
-        audio.srcObject = streamNode.mediaStream
         audio.muted = true
+        audio.srcObject = streamNode.mediaStream
       }
 
       const value = { stream: streamNode, gain: gainNode, audio }
@@ -58,8 +57,6 @@ export function addVoiceStream(streams: RemoteStream[]) {
 // Then we cache that AudioContext and append all the streams.
 // Workaround for browsers that need a click in order to play some sound
 export function initVoiceContext(localStream: LocalStream) {
-  if (!isChrome()) {
-    const [stream] = addVoiceStream([localStream as any as RemoteStream])
-    stream.gain.gain.value = 0
-  }
+  const [stream] = addVoiceStream([localStream as any as RemoteStream], true)
+  stream.gain.gain.value = 0
 }
