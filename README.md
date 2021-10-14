@@ -1,1 +1,2 @@
-# base-component
+`make watch`
+`make build`

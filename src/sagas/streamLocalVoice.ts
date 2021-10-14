@@ -1,5 +1,5 @@
 import { select, call, put } from 'redux-saga/effects'
-import { Client, LocalStream, Constraints } from '@dcl/ion-sdk-js'
+import { Client, LocalStream, Constraints } from '../ion'
 
 import { setLocalStream } from '../actions'
 import { getClient } from '../selectors'

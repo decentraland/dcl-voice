@@ -1,6 +1,6 @@
-import { Client, RemoteStream, LocalStream } from '@dcl/ion-sdk-js'
+import { Client, RemoteStream, LocalStream } from './ion'
 import { action } from 'typesafe-actions'
-import { IonSFUJSONRPCSignal } from '@dcl/ion-sdk-js/lib/signal/json-rpc-impl'
+import { IonSFUJSONRPCSignal } from './ion/signal/json-rpc-impl'
 
 import { VoiceState } from './types'
 

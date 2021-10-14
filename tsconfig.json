@@ -13,6 +13,7 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
+    "decs.d.ts",
     "src"
   ]
 }

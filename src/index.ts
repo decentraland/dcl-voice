@@ -1,6 +1,6 @@
 // tslint:disable: no-commented-out-code
 
-import { LocalStream, RemoteStream } from '@dcl/ion-sdk-js'
+import { LocalStream, RemoteStream } from './ion'
 import { getValue, getContext, isChrome, setValue2, getDestination } from './utils'
 import { startLoopback } from './loopback'
 

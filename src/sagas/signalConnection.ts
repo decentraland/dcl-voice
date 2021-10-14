@@ -1,5 +1,5 @@
-import { Client } from '@dcl/ion-sdk-js'
-import { IonSFUJSONRPCSignal } from '@dcl/ion-sdk-js/lib/signal/json-rpc-impl'
+import { Client } from '../ion'
+import { IonSFUJSONRPCSignal } from '../ion/signal/json-rpc-impl'
 import { put, call, take, select } from 'redux-saga/effects'
 import { EventChannel, eventChannel } from 'redux-saga'
 

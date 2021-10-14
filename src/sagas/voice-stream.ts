@@ -1,5 +1,5 @@
 import { select, call } from 'redux-saga/effects'
-import { RemoteStream } from '@dcl/ion-sdk-js'
+import { RemoteStream } from '../ion'
 
 import { AddRemoteStream, RemoveRemoteStream, REMOVE_REMOTE_STREAM, SetLocalStream } from '../actions'
 import { getRemoteStreams } from '../selectors'
