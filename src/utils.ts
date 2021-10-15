@@ -6,6 +6,7 @@ type Cache = {
     | {
         stream: MediaStreamAudioSourceNode
         gain: GainNode
+        pan: PannerNode
         audio?: HTMLAudioElement
       }
     | undefined
