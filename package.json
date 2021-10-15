@@ -20,7 +20,8 @@
     "url": "https://github.com/decentraland/dcl-voice/issues"
   },
   "engines": {
-    "npm": "^7.0.0"
+    "node": "^14.0.0",
+    "npm": "^8.0.0"
   },
   "prettier": {
     "printWidth": 80,

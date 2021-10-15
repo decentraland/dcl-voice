@@ -7,6 +7,7 @@ CONCURRENTLY = node_modules/.bin/concurrently
 
 install:
 	npm ci
+	$(MAKE) build-lib
 	cd test-app; npm ci
 
 test:
