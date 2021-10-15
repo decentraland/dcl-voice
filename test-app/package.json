@@ -6,7 +6,6 @@
     "@types/redux-logger": "^3.0.9"
   },
   "dependencies": {
-    "@dcl/ion-sdk-js": "^1.0.0-20211014143902.commit-612456c",
     "@dcl/voice": "^1.0.0-20211014205022.commit-21e049f",
     "@hpcc-js/wasm": "^1.12.4",
     "@testing-library/jest-dom": "^5.14.1",

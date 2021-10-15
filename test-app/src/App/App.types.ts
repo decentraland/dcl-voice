@@ -1,5 +1,5 @@
 import { startVoice, joinRoom, startLocalStream } from '@dcl/voice/dist/actions'
-import { LocalStream, RemoteStream } from '@dcl/ion-sdk-js'
+import { LocalStream, RemoteStream } from '@dcl/voice/dist/ion'
 
 export type Props = {
   connected: boolean

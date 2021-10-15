@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { LocalStream, RemoteStream } from '@dcl/ion-sdk-js'
+import { LocalStream, RemoteStream } from '@dcl/voice/dist/ion'
 import { Card } from 'decentraland-ui'
 
 import styles from './video.module.css'

@@ -1,5 +1,5 @@
-import { Client, Constraints, LocalStream, RemoteStream } from '@dcl/ion-sdk-js'
-import { IonSFUJSONRPCSignal } from '@dcl/ion-sdk-js/lib/signal/json-rpc-impl'
+import { Client, Constraints, LocalStream, RemoteStream } from '@dcl/voice/dist/ion'
+import { IonSFUJSONRPCSignal } from '@dcl/voice/dist/ion/signal/json-rpc-impl'
 import { EventEmitter } from 'events'
 
 type Options = {
