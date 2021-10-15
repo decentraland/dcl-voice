@@ -51,8 +51,8 @@ export async function addVoiceStream(
       distanceModel: 'inverse'
     } as const
 
-    const panNode = stream.panner = context.createPanner()
-    const gainNode = stream.gain = context.createGain()
+    const panNode = (stream.panner = context.createPanner())
+    const gainNode = (stream.gain = context.createGain())
 
     streamNode.connect(panNode)
     panNode.connect(gainNode)

@@ -8,7 +8,7 @@ import { getContext } from '../utils'
 export function* streamPosition(action: SetStreamPosition) {
   const streams: RemoteStreamWithPanner[] = yield select(getRemoteStreams)
 
-  for (let stream of streams) {
+  for (const stream of streams) {
     if (stream.id == action.payload.streamId && stream.panner) {
       // even thouth setPosition and setOrientation are deprecated, that
       // is the only way to set positions in Firefox and Safari
