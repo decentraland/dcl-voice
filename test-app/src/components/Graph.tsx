@@ -225,6 +225,8 @@ export function CurrentGraph() {
           label = ${JSON.stringify("AudioContext\nglobalThis.__node_" + n)};
         }
         `)
+      } else if (node instanceof PannerNode) {
+        nodes.push(`${nodeName(node)} [label=${JSON.stringify(`Panner ${node.positionX.value},${node.positionY.value}\nglobalThis.__node_${n}`)},shape="diamond"];`);
       } else {
         nodes.push(`${nodeName(node)} [label=${JSON.stringify(node.nodeName + "\nglobalThis.__node_" + n)}];`);
       }
@@ -288,7 +290,58 @@ export function Dot(props: { code: string }) {
     <>
       {error && <pre>{error}</pre>}
       <DownloadSvg dangerouslySetInnerHTML={{ __html: html }} />
+      <PositionalCanvas />
     </>
+  );
+}
+
+const canvasSize = 512
+const canvasHalfSize = canvasSize / 2
+function drawCanvas(ctx: CanvasRenderingContext2D, graph: Graph) {
+  ctx.clearRect(0, 0, canvasSize, canvasSize)
+  for (const node of Object.values(graph.nodes) as Iterable<AudioNode & BaseNode>) {
+    if (node instanceof PannerNode) {
+      ctx.beginPath();
+      ctx.arc(
+        canvasHalfSize + node.positionX.value,
+        canvasHalfSize + node.positionZ.value, 4, 0, 2 * Math.PI
+      );
+      ctx.stroke();
+      ctx.font = "16px Arial";
+      ctx.fillText(node.nodeName, canvasHalfSize + node.positionX.value + 8, canvasHalfSize + node.positionZ.value);
+    } else if (node instanceof AudioListener) {
+      ctx.beginPath();
+      ctx.arc(
+        canvasHalfSize + node.positionX.value,
+        canvasHalfSize + node.positionZ.value, 4, 0, 2 * Math.PI
+      );
+      ctx.fill();
+      ctx.stroke();
+      ctx.font = "16px Arial";
+      ctx.fillText(node.nodeName, canvasHalfSize + node.positionX.value + 8, canvasHalfSize + node.positionZ.value);
+    }
+  }
+}
+
+export function PositionalCanvas() {
+  const canvas = useRef<HTMLCanvasElement | null>(null);
+
+  const [graph, setGraph] = useState<Graph>(currentGraphState)
+
+  useEffect(() => {
+    events.on('graphChanged', setGraph)
+  }, [])
+
+
+  useEffect(() => {
+    if (canvas.current) {
+      const context = canvas.current.getContext('2d');
+      drawCanvas(context!, graph);
+    }
+  }, [graph]);
+
+  return (
+    <canvas ref={canvas} height={512} width={512} />
   );
 }
 

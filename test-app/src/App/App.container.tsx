@@ -20,7 +20,7 @@ const mapState = (state: RootState): MapStateProps => {
   return {
     connected: getConnected(state),
     remoteStreams: getRemoteStreams(state),
-    localStream: getLocalStream(state)
+    localStream: getLocalStream(state),
   }
 }
 

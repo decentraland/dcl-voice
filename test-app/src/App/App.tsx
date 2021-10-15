@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Button, Card, Logo } from 'decentraland-ui'
+import { Button, Logo } from 'decentraland-ui'
 
 import styles from './App.module.css'
 import { Props } from './App.types'
@@ -39,7 +39,7 @@ const App: React.FC<Props> = ({
           {!localStream ? 'Loading...' : 'Listening'}
         </Button>
       </div>
-      <div className={styles.videoContainer}>
+      {/* <div className={styles.videoContainer}>
         <Card.Group>
           {remoteStreams.map(stream => (
             <Card key={stream.id}>
@@ -49,7 +49,7 @@ const App: React.FC<Props> = ({
             </Card>
           ))}
         </Card.Group>
-      </div>
+      </div> */}
       <CurrentGraph />
     </div>
   )
