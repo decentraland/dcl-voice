@@ -8,7 +8,7 @@ CONCURRENTLY = node_modules/.bin/concurrently
 install:
 	npm ci
 	$(MAKE) build-lib
-	cd test-app; npm i "../." && npm ci
+	cd test-app; npm i "../." && npm ci && npm run postinstall
 
 test:
 	node_modules/.bin/jest --detectOpenHandles --colors --runInBand $(TESTARGS)
