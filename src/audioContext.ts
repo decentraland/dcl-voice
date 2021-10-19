@@ -1,13 +1,5 @@
-import { LocalStream, RemoteStream } from './ion'
-import {
-  getValue,
-  getContext,
-  isChrome,
-  setValue2,
-  getDestination,
-  getAudio
-} from './utils'
-import { startLoopback } from './loopback'
+import { RemoteStream } from './ion'
+import { getValue, getContext, setValue2, getDestination } from './utils'
 
 export function removeVoiceStream(streamId: string) {
   const stream = getValue('streams')[streamId]
@@ -23,10 +15,7 @@ export function removeVoiceStream(streamId: string) {
   setValue2('streams', streamId, undefined)
 }
 
-export async function addVoiceStream(
-  streams: RemoteStream[],
-  _isLocal?: boolean
-) {
+export async function addVoiceStream(streams: RemoteStream[]) {
   const context = getContext()
   const destination = getDestination()
   const oldStreams = getValue('streams')
@@ -70,24 +59,4 @@ export async function addVoiceStream(
       gain: gainNode
     })
   }
-}
-
-// Add local stream muted to initialize AudioContext.
-// Then we cache that AudioContext and append all the streams.
-// Workaround for browsers that need a click in order to play some sound
-export async function initVoiceContext(localStream: LocalStream) {
-  const context = getContext()
-  const destination = getDestination()
-  const audio = getAudio()
-
-  const stream = context.createMediaStreamSource(localStream)
-  const gain = context.createGain()
-  gain.gain.value = 0
-  stream.connect(gain).connect(destination)
-
-  const destinationStream = isChrome()
-    ? await startLoopback(destination.stream)
-    : destination.stream
-  audio.srcObject = destinationStream
-  await audio.play()
 }

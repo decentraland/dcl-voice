@@ -13,9 +13,9 @@ import {
 } from '../actions'
 import { joinRoom } from './joinRoom'
 import { startVoiceSaga } from './signalConnection'
-import { streamLocalVoice } from './streamLocalVoice'
-import { reconnectVoice } from './reconnectVoice'
-import { voiceStream } from './voice-stream'
+import { streamLocalVoice } from './localStream'
+import { reconnectVoice } from './reconnect'
+import { remoteStream } from './remoteStreams'
 import { localStreamPosition, streamPosition } from './position'
 
 export function* voiceSaga() {
@@ -32,9 +32,9 @@ export function* voiceSaga() {
   yield takeEvery(RECONNECT_VOICE, reconnectVoice)
 
   // Start/Stop streams
-  yield takeEvery(ADD_REMOTE_STREAM, voiceStream)
-  yield takeEvery(REMOVE_REMOTE_STREAM, voiceStream)
-  yield takeEvery(SET_LOCAL_STREAM, voiceStream)
+  yield takeEvery(ADD_REMOTE_STREAM, remoteStream)
+  yield takeEvery(REMOVE_REMOTE_STREAM, remoteStream)
+  yield takeEvery(SET_LOCAL_STREAM, remoteStream)
 
   // Positional audio
   yield takeEvery(SET_STREAM_POSITION, streamPosition)

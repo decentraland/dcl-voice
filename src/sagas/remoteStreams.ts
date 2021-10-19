@@ -8,11 +8,11 @@ import {
   SetLocalStream
 } from '../actions'
 import { getRemoteStreams } from '../selectors'
-import { addVoiceStream, removeVoiceStream } from '../'
+import { addVoiceStream, removeVoiceStream } from '../audioContext'
 import { isContextDefined } from '../utils'
 
 type Action = AddRemoteStream | RemoveRemoteStream | SetLocalStream
-export function* voiceStream(action: Action) {
+export function* remoteStream(action: Action) {
   if (!isContextDefined()) {
     return
   }
