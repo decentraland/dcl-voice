@@ -1,9 +1,16 @@
-import { Client, RemoteStream, LocalStream } from './ion'
+import { Client, LocalStream, RemoteStream } from './ion'
 import { IonSFUJSONRPCSignal } from './ion/signal/json-rpc-impl'
 
-export type RemoteStreamWithPanner = RemoteStream & {
-  panner?: PannerNode
-  gain?: GainNode
+export type VoiceSpatialParams = {
+  position: VoiceReadOnlyVector3
+  orientation: VoiceReadOnlyVector3
+}
+
+export type RemoteStreamWithPanner = {
+  panner: PannerNode
+  gain: GainNode
+  node: MediaStreamAudioSourceNode
+  stream: RemoteStream
 }
 
 export type VoiceState = {
@@ -16,7 +23,7 @@ export type VoiceState = {
   connected: boolean
   client?: Client
   signal?: IonSFUJSONRPCSignal
-  remoteStreams: RemoteStreamWithPanner[]
+  remoteStreams: RemoteStream[]
   localStream?: LocalStream
   reconnectTimes: number
 }

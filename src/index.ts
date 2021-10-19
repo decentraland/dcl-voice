@@ -4,10 +4,10 @@ import {
   getContext,
   isChrome,
   setValue2,
-  getDestination
+  getDestination,
+  getAudio
 } from './utils'
 import { startLoopback } from './loopback'
-import { RemoteStreamWithPanner } from './types'
 
 export function removeVoiceStream(streamId: string) {
   const stream = getValue('streams')[streamId]
@@ -16,19 +16,15 @@ export function removeVoiceStream(streamId: string) {
     return
   }
 
-  stream.stream.disconnect()
+  stream.node.disconnect()
   stream.gain.disconnect()
-  stream.pan.disconnect()
-  if (stream.audio) {
-    stream.audio.srcObject = null
-    stream.audio.pause()
-    stream.audio.currentTime = 0
-  }
+  stream.panner.disconnect()
+
   setValue2('streams', streamId, undefined)
 }
 
 export async function addVoiceStream(
-  streams: RemoteStreamWithPanner[],
+  streams: RemoteStream[],
   _isLocal?: boolean
 ) {
   const context = getContext()
@@ -43,7 +39,6 @@ export async function addVoiceStream(
     }
 
     const streamNode = context.createMediaStreamSource(stream)
-
     const options = {
       maxDistance: 10000,
       refDistance: 5,
@@ -51,8 +46,8 @@ export async function addVoiceStream(
       distanceModel: 'inverse'
     } as const
 
-    const panNode = (stream.panner = context.createPanner())
-    const gainNode = (stream.gain = context.createGain())
+    const panNode = context.createPanner()
+    const gainNode = context.createGain()
 
     streamNode.connect(panNode)
     panNode.connect(gainNode)
@@ -68,39 +63,31 @@ export async function addVoiceStream(
     panNode.distanceModel = options.distanceModel ?? 'inverse'
     panNode.rolloffFactor = 1.0
 
-    let audio: HTMLAudioElement | undefined
-
-    if (isChrome()) {
-      // audio = new Audio()
-      // audio.muted = true
-      // audio.srcObject = streamNode.mediaStream
-    }
-
-    setValue2('streams', stream.id, {
-      gain: gainNode,
-      pan: panNode,
-      stream: streamNode,
-      audio
-    })
+    setValue2(
+      'streams',
+      stream.id,
+      { stream, node: streamNode, panner: panNode, gain: gainNode }
+    )
   }
-
-  const loopback = await startLoopback(destination.stream)
-  const audio = new Audio()
-  audio.autoplay = true
-  audio.srcObject = loopback
-  audio.volume = 1
-  await audio.play()
 }
 
 // Add local stream muted to initialize AudioContext.
 // Then we cache that AudioContext and append all the streams.
 // Workaround for browsers that need a click in order to play some sound
-export function initVoiceContext(localStream: LocalStream) {
+export async function initVoiceContext(localStream: LocalStream) {
   const context = getContext()
   const destination = getDestination()
+  const audio = getAudio()
+
   const stream = context.createMediaStreamSource(localStream)
   const gain = context.createGain()
   gain.gain.value = 0
   stream.connect(gain).connect(destination)
-  // addVoiceStream([localStream as any as RemoteStream], true)
+
+  const destinationStream = isChrome()
+    ? await startLoopback(destination.stream)
+    : destination.stream
+  audio.volume = 1
+  audio.srcObject = destinationStream
+  await audio.play()
 }

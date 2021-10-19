@@ -1,4 +1,4 @@
-import { startVoice, joinRoom, startLocalStream } from '@dcl/voice/dist/actions'
+import { startVoice, joinRoom, startLocalStream, setLocalPosition, setStreamPosition } from '@dcl/voice/dist/actions'
 import { LocalStream, RemoteStream } from '@dcl/voice/dist/ion'
 
 export type Props = {
@@ -8,6 +8,8 @@ export type Props = {
   onStartVoice: typeof startVoice
   onStartLocalStream: typeof startLocalStream
   onJoinRoom: typeof joinRoom
+  onSetLocalPosition: typeof setLocalPosition
+  onSetStreamPosition: typeof setStreamPosition
 }
 
 export type MapStateProps = Pick<
@@ -17,4 +19,11 @@ export type MapStateProps = Pick<
   | 'remoteStreams'
 >
 
-export type MapDispatchProps = Pick<Props, 'onStartVoice' | 'onJoinRoom' | 'onStartLocalStream'>
+export type MapDispatchProps = Pick<
+  Props,
+  | 'onStartVoice'
+  | 'onJoinRoom'
+  | 'onStartLocalStream'
+  | 'onSetLocalPosition'
+  | 'onSetStreamPosition'
+>

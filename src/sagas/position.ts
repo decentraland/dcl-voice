@@ -1,26 +1,23 @@
 import { select } from 'redux-saga/effects'
 
 import { SetLocalPosition, SetStreamPosition } from '../actions'
-import { getRemoteStreams } from '../selectors'
-import { RemoteStreamWithPanner } from '../types'
-import { getContext } from '../utils'
+import { RemoteStreamWithPanner, VoiceReadOnlyVector3, VoiceSpatialParams } from '../types'
+import { getContext, getValue } from '../utils'
 
 export function* streamPosition(action: SetStreamPosition) {
-  const streams: RemoteStreamWithPanner[] = yield select(getRemoteStreams)
+  const streams: Record<string, RemoteStreamWithPanner> = yield select(() => getValue('streams'))
+  const stream = streams[action.payload.streamId]
 
-  for (const stream of streams) {
-    if (stream.id == action.payload.streamId && stream.panner) {
-      // even thouth setPosition and setOrientation are deprecated, that
-      // is the only way to set positions in Firefox and Safari
-      const { x, y, z } = action.payload.position
-      stream.panner.setPosition(x, y, z)
-      stream.panner.setOrientation(
-        action.payload.position.x,
-        action.payload.position.y,
-        action.payload.position.z
-      )
-      break
-    }
+  if (stream.panner) {
+    // even thouth setPosition and setOrientation are deprecated, that
+    // is the only way to set positions in Firefox and Safari
+    const { x, y, z } = action.payload.position
+    stream.panner.setPosition(x, y, z)
+    stream.panner.setOrientation(
+      action.payload.position.x,
+      action.payload.position.y,
+      action.payload.position.z
+    )
   }
 }
 
