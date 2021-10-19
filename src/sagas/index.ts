@@ -7,13 +7,16 @@ import {
   START_LOCAL_STREAM,
   START_VOICE,
   JOIN_ROOM,
-  SET_LOCAL_STREAM
+  SET_LOCAL_STREAM,
+  SET_STREAM_POSITION,
+  SET_LOCAL_POSITION
 } from '../actions'
 import { joinRoom } from './joinRoom'
 import { startVoiceSaga } from './signalConnection'
 import { streamLocalVoice } from './streamLocalVoice'
 import { reconnectVoice } from './reconnectVoice'
 import { voiceStream } from './voice-stream'
+import { localStreamPosition, streamPosition } from './position'
 
 export function* voiceSaga() {
   // Initalize sfu ws => call joinRoom to join default island.
@@ -32,4 +35,8 @@ export function* voiceSaga() {
   yield takeEvery(ADD_REMOTE_STREAM, voiceStream)
   yield takeEvery(REMOVE_REMOTE_STREAM, voiceStream)
   yield takeEvery(SET_LOCAL_STREAM, voiceStream)
+
+  // Positional audio
+  yield takeEvery(SET_STREAM_POSITION, streamPosition)
+  yield takeEvery(SET_LOCAL_POSITION, localStreamPosition)
 }

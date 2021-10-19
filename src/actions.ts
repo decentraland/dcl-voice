@@ -2,7 +2,7 @@ import { Client, RemoteStream, LocalStream } from './ion'
 import { action } from 'typesafe-actions'
 import { IonSFUJSONRPCSignal } from './ion/signal/json-rpc-impl'
 
-import { VoiceState } from './types'
+import { VoiceReadOnlyVector3, VoiceState } from './types'
 
 export const START_VOICE = 'Start Voice'
 export const startVoice = (config?: Partial<VoiceState['config']>) =>
@@ -31,6 +31,20 @@ export type SetError = ReturnType<typeof setError>
 export const RECONNECT_VOICE = 'Reconnect voice'
 export const reconnectVoice = () => action(RECONNECT_VOICE)
 export type ReconnectVoice = ReturnType<typeof reconnectVoice>
+
+export const SET_LOCAL_POSITION = 'Voice: Set local position'
+export const setLocalPosition = (
+  position: VoiceReadOnlyVector3,
+  orientation: VoiceReadOnlyVector3
+) => action(SET_LOCAL_POSITION, { position, orientation })
+export type SetLocalPosition = ReturnType<typeof setLocalPosition>
+
+export const SET_STREAM_POSITION = 'Voice: Set stream position'
+export const setStreamPosition = (
+  streamId: string,
+  position: VoiceReadOnlyVector3
+) => action(SET_STREAM_POSITION, { streamId, position })
+export type SetStreamPosition = ReturnType<typeof setStreamPosition>
 
 // MANAGE STREAMS
 export const START_LOCAL_STREAM = 'Start local stream'
