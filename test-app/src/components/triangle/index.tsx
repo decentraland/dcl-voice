@@ -8,7 +8,7 @@ import { stringToHex } from '../../utils'
 type Props = {
   keysPressed: string[]
   id: string
-  position?: Pick<VoiceReadOnlyVector3, 'x' | 'y'> & { deg: number }
+  position?: VoiceReadOnlyVector3 & { deg: number }
   onMouseDown: () => void
 }
 
@@ -22,7 +22,7 @@ const Triangle: React.FC<Props> = ({ id, position, onMouseDown, keysPressed }) =
       className={styles.triangle}
       style={{
         cursor: keysPressed.includes('Shift') ? 'nesw-resize' : 'grab',
-        top: `${position?.y}px`,
+        top: `${position?.z}px`,
         left: `${position?.x}px`,
         transform: `rotate(${position?.deg}deg)`
       }}

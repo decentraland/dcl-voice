@@ -130,6 +130,16 @@ function addNode(node: any) {
   })
 }
 
+PannerNode.prototype.setPosition = decoratePrototype(PannerNode.prototype.setPosition, function (this: PannerNode, result: any, args: any[]) {
+  events.emit('graphChanged', { ...currentGraphState })
+});
+
+let audioListenerPosition: [number, number, number]
+AudioListener.prototype.setPosition = decoratePrototype(AudioListener.prototype.setPosition, function (this: PannerNode, result: any, args: any[]) {
+  audioListenerPosition = args as [number, number, number]
+  events.emit('graphChanged', { ...currentGraphState })
+});
+
 AudioContext.prototype.createBufferSource = decoratePrototype(AudioContext.prototype.createBufferSource, function (this: AudioContext, result: any, args: any[]) {
   console.log('WebAudioDebugger: Create BufferSourceNode', { this: this, result, args });
   this.addEventListener('ended', function () { console.log('WebAudioDebugger: AudioBufferSourceNode ended') });
@@ -289,15 +299,19 @@ export function Dot(props: { code: string }) {
   return (
     <>
       {error && <pre>{error}</pre>}
-      <DownloadSvg dangerouslySetInnerHTML={{ __html: html }} />
-      <PositionalCanvas />
+      <div style={{ display: 'flex' }}>
+        <DownloadSvg dangerouslySetInnerHTML={{ __html: html }} />
+        <PositionalCanvas />
+      </div>
     </>
   );
 }
 
 const canvasSize = 512
-const canvasHalfSize = canvasSize / 2
+const canvasHalfSize = 0
+
 function drawCanvas(ctx: CanvasRenderingContext2D, graph: Graph) {
+  console.log(graph)
   ctx.clearRect(0, 0, canvasSize, canvasSize)
   for (const node of Object.values(graph.nodes) as Iterable<AudioNode & BaseNode>) {
     if (node instanceof PannerNode) {
@@ -310,15 +324,17 @@ function drawCanvas(ctx: CanvasRenderingContext2D, graph: Graph) {
       ctx.font = "16px Arial";
       ctx.fillText(node.nodeName, canvasHalfSize + node.positionX.value + 8, canvasHalfSize + node.positionZ.value);
     } else if (node instanceof AudioListener) {
+      // eslint-disable-next-line
+      const [x, _y, z] = audioListenerPosition || [0, 0, 0]
       ctx.beginPath();
       ctx.arc(
-        canvasHalfSize + node.positionX.value,
-        canvasHalfSize + node.positionZ.value, 4, 0, 2 * Math.PI
+        canvasHalfSize + x,
+        canvasHalfSize + z, 4, 0, 2 * Math.PI
       );
       ctx.fill();
       ctx.stroke();
       ctx.font = "16px Arial";
-      ctx.fillText(node.nodeName, canvasHalfSize + node.positionX.value + 8, canvasHalfSize + node.positionZ.value);
+      ctx.fillText(node.nodeName, canvasHalfSize + x + 8, canvasHalfSize + z);
     }
   }
 }
@@ -341,7 +357,7 @@ export function PositionalCanvas() {
   }, [graph]);
 
   return (
-    <canvas ref={canvas} height={512} width={512} />
+    <canvas style={{ border: '1px solid' }} ref={canvas} height={512} width={512} />
   );
 }
 

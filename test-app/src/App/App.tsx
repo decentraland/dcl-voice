@@ -85,20 +85,22 @@ const App: React.FC<Props> = ({
     const prevPosition = positions[streamIdDragging] || { x: 0, y: 0, z: 0 }
 
     if (!keysPressed.includes('Shift')) {
-      const position = { ...prevPosition, x: e.clientX, y: e.clientY }
+      const position = { ...prevPosition, x: e.clientX, z: e.clientY }
       setPosistions({ ...positions, [streamIdDragging]: position })
       throttled.current(streamIdDragging, position, streamIdDragging === localStream?.id)
       return
     }
 
     const centerX = (prevPosition.x) + (TRIANGLE_SIZE / 2);
-    const centerY = (prevPosition.y) + (TRIANGLE_SIZE / 2);
+    const centerZ = (prevPosition.z) + (TRIANGLE_SIZE / 2);
     const mouseX = e.clientX;
     const mouseY = e.clientY;
-    const radians = Math.atan2(mouseX - centerX, mouseY - centerY);
+    const radians = Math.atan2(mouseX - centerX, mouseY - centerZ);
     const deg = (radians * (180 / Math.PI) * -1) + 90;
     setPosistions({ ...positions, [streamIdDragging]: { ...prevPosition, deg: deg } })
   }
+
+  console.log(streamIdDragging)
 
   return (
     <div

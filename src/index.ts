@@ -87,7 +87,6 @@ export async function initVoiceContext(localStream: LocalStream) {
   const destinationStream = isChrome()
     ? await startLoopback(destination.stream)
     : destination.stream
-  audio.volume = 1
   audio.srcObject = destinationStream
   await audio.play()
 }
