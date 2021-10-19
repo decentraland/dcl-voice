@@ -26,8 +26,7 @@ export function* streamLocalVoice() {
     LocalStream.getUserMedia(options)
   )
   setUser({ id: window.location.search, streamId: localStream.id })
-  initVoiceContext(localStream)
-
+  yield call(() => initVoiceContext(localStream))
   yield call(() => client.publish(localStream))
   yield put(setLocalStream(localStream))
 

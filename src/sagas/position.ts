@@ -1,11 +1,13 @@
 import { select } from 'redux-saga/effects'
 
 import { SetLocalPosition, SetStreamPosition } from '../actions'
-import { RemoteStreamWithPanner, VoiceReadOnlyVector3, VoiceSpatialParams } from '../types'
+import { RemoteStreamWithPanner } from '../types'
 import { getContext, getValue } from '../utils'
 
+type Streams = Record<string, RemoteStreamWithPanner>
+
 export function* streamPosition(action: SetStreamPosition) {
-  const streams: Record<string, RemoteStreamWithPanner> = yield select(() => getValue('streams'))
+  const streams: Streams = yield select(() => getValue('streams'))
   const stream = streams[action.payload.streamId]
 
   if (stream.panner) {

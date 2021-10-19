@@ -1,4 +1,4 @@
-import { RemoteStreamWithPanner, VoiceReadOnlyVector3, VoiceSpatialParams } from "./types"
+import { RemoteStreamWithPanner } from './types'
 
 const AudioContext = (window as any).webkitAudioContext || window.AudioContext
 
@@ -61,7 +61,8 @@ export function getAudio() {
   if (cache) return cache
 
   const audio = new Audio()
-  return setValue('audio', audio)!
+  setValue('audio', audio)
+  return audio
 }
 
 export function isNotUndefined<T>(value: T | undefined): value is T {

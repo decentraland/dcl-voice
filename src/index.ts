@@ -63,11 +63,12 @@ export async function addVoiceStream(
     panNode.distanceModel = options.distanceModel ?? 'inverse'
     panNode.rolloffFactor = 1.0
 
-    setValue2(
-      'streams',
-      stream.id,
-      { stream, node: streamNode, panner: panNode, gain: gainNode }
-    )
+    setValue2('streams', stream.id, {
+      stream,
+      node: streamNode,
+      panner: panNode,
+      gain: gainNode
+    })
   }
 }
 
