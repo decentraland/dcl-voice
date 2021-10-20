@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { v4 as uuid } from 'uuid'
 import { throttle, uniq } from 'lodash'
 import { Button, Logo } from 'decentraland-ui'
 import { VoiceReadOnlyVector3 } from '@dcl/voice/dist/types'
@@ -55,7 +56,10 @@ const App: React.FC<Props> = ({
   // After component mount start the voice ws
   useEffect(
     () => {
-      onStartVoice({ url: 'wss://test-sfu.decentraland.zone/ws' })
+      onStartVoice({
+        url: 'wss://test-sfu.decentraland.zone/ws',
+        userAddress: window.location.search || uuid()
+      })
     },
     [onStartVoice]
   )
@@ -65,7 +69,7 @@ const App: React.FC<Props> = ({
   useEffect(
     () => {
       if (connected) {
-        onJoinRoom('boedo', Math.random() + 'BOEDOOOOOOOO' + Math.random())
+        onJoinRoom('boedo')
       }
     },
     [connected, onJoinRoom]
@@ -99,8 +103,6 @@ const App: React.FC<Props> = ({
     const deg = (radians * (180 / Math.PI) * -1) + 90;
     setPosistions({ ...positions, [streamIdDragging]: { ...prevPosition, deg: deg } })
   }
-
-  console.log(streamIdDragging)
 
   return (
     <div
