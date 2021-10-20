@@ -1,7 +1,7 @@
 import { Client, RemoteStream, LocalStream } from './ion'
 import { action } from 'typesafe-actions'
-import { IonSFUJSONRPCSignal } from './ion/signal/json-rpc-impl'
 
+import { IonSFUJSONRPCSignal } from './ion/signal/json-rpc-impl'
 import { VoiceReadOnlyVector3, VoiceState } from './types'
 
 export const START_VOICE = 'Start Voice'
@@ -15,14 +15,18 @@ export const voiceInitialized = (signal: IonSFUJSONRPCSignal, client: Client) =>
 export type VoiceInitialized = ReturnType<typeof voiceInitialized>
 
 export const JOIN_ROOM = 'Join voice room'
-export const joinRoom = (roomId: string, userId: string) =>
-  action(JOIN_ROOM, { roomId, userId })
+export const joinRoom = (roomId: string) => action(JOIN_ROOM, { roomId })
 export type JoinRoom = ReturnType<typeof joinRoom>
 
 export const SET_CONFIG = 'Voice set config'
 export const setConfig = (config: Partial<VoiceState['config']>) =>
   action(SET_CONFIG, { config })
 export type SetConfig = ReturnType<typeof setConfig>
+
+export const SET_CONTEXT = 'Voice set context'
+export const setContext = (context: Partial<VoiceState['context']>) =>
+  action(SET_CONTEXT, { context })
+export type SetContext = ReturnType<typeof setContext>
 
 export const SET_ERROR = 'Voice error'
 export const setError = (error: string) => action(SET_ERROR, { error })
@@ -70,6 +74,7 @@ export type VoiceActions =
   | StartVoice
   | VoiceInitialized
   | SetConfig
+  | SetContext
   | SetError
   | ReconnectVoice
   | JoinRoom

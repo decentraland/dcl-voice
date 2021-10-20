@@ -7,21 +7,23 @@ import {
   REMOVE_REMOTE_STREAM,
   SetLocalStream
 } from '../actions'
-import { getRemoteStreams } from '../selectors'
+import { getContext, getRemoteStreams, GetContext } from '../selectors'
+
 import { addVoiceStream, removeVoiceStream } from '../audioContext'
-import { isContextDefined } from '../utils'
 
 type Action = AddRemoteStream | RemoveRemoteStream | SetLocalStream
+
 export function* remoteStream(action: Action) {
-  if (!isContextDefined()) {
+  const context: GetContext = yield select(getContext)
+  if (!context.audioContext) {
     return
   }
 
   if (action.type === REMOVE_REMOTE_STREAM) {
-    yield call(() => removeVoiceStream(action.payload.streamId))
+    yield call(() => removeVoiceStream(context, action.payload.streamId))
     return
   }
 
   const remoteStreams: RemoteStream[] = yield select(getRemoteStreams)
-  yield call(() => addVoiceStream(remoteStreams))
+  yield call(() => addVoiceStream(context, remoteStreams))
 }

@@ -1,7 +1,9 @@
 import { action } from 'typesafe-actions'
 
-import { getValue, setValue2 } from './utils'
+import { setValue2 } from './utils'
 
+// Messages that are sent via this channel.
+// Every time we receive a join, we send a response saying who we are.
 export const JOIN = 'JOIN_DATACHANNEL'
 export const join = (user: User) => action(JOIN, user)
 export type Join = ReturnType<typeof join>
@@ -15,8 +17,10 @@ type User = {
   id: string
   streamId: string
 }
+
+// Internal vars
 let _user: User
-let queue: (() => void) | undefined
+let sendUserMessage: (() => void) | undefined
 
 function validMessage(message: unknown): message is Message {
   const type = (message as any).type
@@ -27,10 +31,6 @@ export function setUser(user: User) {
   _user = user
 }
 
-function addToMap(message: Message) {
-  setValue2('mapping', message.payload.streamId, message.payload.id)
-}
-
 // We have two listenDataChannel.
 // 1- The first time the channel is created, called after joinRoom
 //    this only happens once.
@@ -38,33 +38,50 @@ function addToMap(message: Message) {
 //    already created. All the clients listen this way except the one who has
 //    created the channel (1)
 export function listenDataChannel(channel: RTCDataChannel, log: string) {
-  if (queue) {
-    queue()
+  // TODO what about channel closed ?
+  // Should we disconnect/close the connection and create a new one ?
+  // This is something to be aware of when we write the tests.
+  console.log(log, 'Listen Data Channel')
+  if (sendUserMessage) {
+    sendUserMessage()
+    sendUserMessage = undefined
     // onDataChannel (2) listener will handle all the messages.
     return
   }
 
+  channel.onerror = (error) => {
+    console.error(log, { error })
+  }
+
+  channel.onclose = (close) => {
+    console.error(log, { close })
+  }
+
   channel.onmessage = ({ data }) => {
     const message: Message = JSON.parse(data)
+    console.log(log, message)
     if (!_user || !validMessage(message)) return
 
     if (message.type === JOIN) {
       channel.send(JSON.stringify(response(_user)))
     }
 
-    addToMap(message)
-    console.log(log, getValue('mapping'))
+    // Add usserAddress: streamId to our internal map
+    setValue2('mapping', message.payload.id, message.payload.streamId)
   }
 
   channel.onopen = () => {
+    console.log(log, 'on open')
     // Sfu client only accepts ondatachannel to be initialized before joinRoom
     // And we dont have the streamId at that moment, so.......
-    // We create a queue that will be executed after getUserMedia is called
+    // We create a sendUserMessage that will be executed after getUserMedia is called
+    const message = () => channel.send(JSON.stringify(join(_user)))
+
     if (!_user) {
-      queue = () => channel.send(JSON.stringify(join(_user)))
+      sendUserMessage = message
       return
     }
 
-    channel.send(JSON.stringify(join(_user)))
+    message()
   }
 }

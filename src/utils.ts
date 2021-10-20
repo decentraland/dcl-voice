@@ -2,15 +2,17 @@ import { RemoteStreamWithPanner } from './types'
 
 const AudioContext = (window as any).webkitAudioContext || window.AudioContext
 
-type Cache = {
-  streams: Record<string, RemoteStreamWithPanner | undefined>
+type StreamId = string
+type AddressId = string
+export type Cache = {
+  streams: Record<StreamId, RemoteStreamWithPanner | undefined>
   audioContext: AudioContext | undefined
-  mapping: Record<string, string>
+  mapping: Record<AddressId, StreamId>
   destination: MediaStreamAudioDestinationNode | undefined
   audio: HTMLAudioElement | undefined
 }
 
-const cache: Cache = {
+export const DEFAULT_CACHE: Cache = {
   audioContext: undefined,
   streams: {},
   mapping: {},
@@ -18,9 +20,7 @@ const cache: Cache = {
   audio: undefined
 }
 
-export function getValue<T extends keyof Cache>(key: T): Cache[T] {
-  return cache[key]
-}
+const cache: Cache = DEFAULT_CACHE
 
 export function setValue<T extends keyof Cache>(
   key: T,
@@ -37,36 +37,21 @@ export function setValue2<T extends keyof Cache, K extends keyof Cache[T]>(
   return ((cache[key] as any)[key2] = value)
 }
 
-export function isContextDefined() {
-  return !!getValue('audioContext')
+export function createContext(): AudioContext {
+  const audioContext = new AudioContext()
+  return setValue('audioContext', audioContext)
 }
 
-export function getContext() {
-  const context =
-    getValue('audioContext') || setValue('audioContext', new AudioContext())
-  return context
+export function createDestination(
+  audioContext: AudioContext
+): MediaStreamAudioDestinationNode {
+  const destination = audioContext.createMediaStreamDestination()
+  return setValue('destination', destination)
 }
 
-export function getDestination() {
-  const destination = getValue('destination')
-  if (destination) return destination
-
-  const context = getContext()
-  return setValue('destination', context.createMediaStreamDestination())
-}
-
-export function getAudio() {
-  const cache = getValue('audio')
-
-  if (cache) return cache
-
+export function createAudio(): HTMLAudioElement {
   const audio = new Audio()
-  setValue('audio', audio)
-  return audio
-}
-
-export function isNotUndefined<T>(value: T | undefined): value is T {
-  return !!value
+  return setValue('audio', audio)
 }
 
 export function isChrome() {

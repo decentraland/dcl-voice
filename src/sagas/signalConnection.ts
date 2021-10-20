@@ -44,6 +44,7 @@ function createSocketChannel(
     )
 
     client.ondatachannel = ({ channel }) => {
+      console.log({ channel })
       if (channel.label === 'data') {
         listenDataChannel(channel, 'onDataChannel')
       }
@@ -92,6 +93,11 @@ export function* startVoiceSaga() {
       return
     }
 
+    if (!config.userAddress) {
+      yield put(setError('invalid user.'))
+      return
+    }
+
     const { client, signal }: SignalConnection = yield call(
       createSignalConnection,
       config.url
@@ -103,7 +109,6 @@ export function* startVoiceSaga() {
     )
 
     yield put(voiceInitialized(signal, client))
-
     while (true) {
       try {
         const payload: VoiceActions = yield take(socketChannel)

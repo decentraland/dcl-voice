@@ -1,8 +1,12 @@
 import { RemoteStream } from './ion'
-import { getValue, getContext, setValue2, getDestination } from './utils'
+import { setValue2 } from './utils'
+import { VoiceState } from './types'
 
-export function removeVoiceStream(streamId: string) {
-  const stream = getValue('streams')[streamId]
+export function removeVoiceStream(
+  context: VoiceState['context'],
+  streamId: string
+) {
+  const stream = context.streams[streamId]
 
   if (!stream) {
     return
@@ -15,10 +19,12 @@ export function removeVoiceStream(streamId: string) {
   setValue2('streams', streamId, undefined)
 }
 
-export async function addVoiceStream(streams: RemoteStream[]) {
-  const context = getContext()
-  const destination = getDestination()
-  const oldStreams = getValue('streams')
+export async function addVoiceStream(
+  context: VoiceState['context'],
+  streams: RemoteStream[]
+) {
+  const { audioContext, destination, streams: oldStreams } = context
+  if (!audioContext || !destination) return
 
   for (const stream of streams) {
     const prevStream = oldStreams[stream.id]
@@ -27,7 +33,7 @@ export async function addVoiceStream(streams: RemoteStream[]) {
       continue
     }
 
-    const streamNode = context.createMediaStreamSource(stream)
+    const streamNode = audioContext.createMediaStreamSource(stream)
     const options = {
       maxDistance: 10000,
       refDistance: 5,
@@ -35,8 +41,8 @@ export async function addVoiceStream(streams: RemoteStream[]) {
       distanceModel: 'inverse'
     } as const
 
-    const panNode = context.createPanner()
-    const gainNode = context.createGain()
+    const panNode = audioContext.createPanner()
+    const gainNode = audioContext.createGain()
 
     streamNode.connect(panNode)
     panNode.connect(gainNode)
