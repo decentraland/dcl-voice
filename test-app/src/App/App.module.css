@@ -1,6 +1,6 @@
 .container {
   min-height: 100vh;
-  padding: 2.4rem 0.5rem;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,25 +8,17 @@
   user-select: none;
 }
 
-.title a {
-  margin-top: 10rem;
-  color: #0070f3;
-  text-decoration: none;
-  font-size: 16rempx;
+.header {
+  margin: 16px;
+  display: flex;
+  align-items: center;
 }
 
-.title,
-.description {
-  text-align: center;
-}
-
-.description {
-  line-height: 1.5;
-  font-size: 1.5rem;
-}
-
-.button {
-  margin-top: 1.6rem
+.header > :first-child {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  min-width: 100px !important;
 }
 
 .videoContainer {
@@ -63,4 +55,20 @@
     width: 100%;
     flex-direction: column;
   }
+}
+
+.graphs {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+
+.graphs > :first-child {
+  position: relative;
+  width: 50%;
+  min-width: 50%;
+  min-height: 100%;
+  border: 1px solid;
+  border-radius: 16px;
 }

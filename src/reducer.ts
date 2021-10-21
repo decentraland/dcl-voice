@@ -43,6 +43,8 @@ export function voiceReducer(
         connected: true,
         reconnectTimes: 0,
         remoteStreams: [],
+        localStream: undefined,
+        context: DEFAULT_CONTEXT,
         error: undefined
       }
     }

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { v4 as uuid } from 'uuid'
 import { throttle, uniq } from 'lodash'
-import { Button, Logo } from 'decentraland-ui'
+import { Logo, SelectField } from 'decentraland-ui'
 import { VoiceReadOnlyVector3 } from '@dcl/voice/dist/types'
 
 import styles from './App.module.css'
@@ -10,6 +10,9 @@ import { CurrentGraph } from '../components/Graph'
 import Triangle from '../components/triangle'
 
 let streamIdDragging: string
+
+const ROOM_1 = 'Room: Casla'
+const ROOM_2 = 'Room: Boedo'
 
 const App: React.FC<Props> = ({
   onJoinRoom,
@@ -20,8 +23,10 @@ const App: React.FC<Props> = ({
   localStream,
   connected,
 }: Props) => {
+  const divRef = useRef<HTMLDivElement>(null)
   const [positions, setPosistions] = useState<Record<string, VoiceReadOnlyVector3 & { deg: number }>>({})
   const [keysPressed, setKeysPressed] = useState<string[]>([])
+  const [currentRoom, setCurrentRoom] = useState<string>(ROOM_1)
   const throttled = useRef(
     throttle((streamId: string, newValue: VoiceReadOnlyVector3, local?: boolean) => {
       if (local) {
@@ -69,10 +74,10 @@ const App: React.FC<Props> = ({
   useEffect(
     () => {
       if (connected) {
-        onJoinRoom('boedo')
+        onJoinRoom(currentRoom)
       }
     },
-    [connected, onJoinRoom]
+    [connected, onJoinRoom, currentRoom]
   )
 
   // Mouse handlers
@@ -85,22 +90,25 @@ const App: React.FC<Props> = ({
   const onMouseMove = (e: React.MouseEvent) => {
     if (!streamIdDragging) return
     if (!e.clientX && !e.clientY) return
+    if (!divRef.current) return
     const TRIANGLE_SIZE = 20
+    const rect = divRef.current.getBoundingClientRect()
     const prevPosition = positions[streamIdDragging] || { x: 0, y: 0, z: 0 }
+    const mouseX = e.clientX - rect.x
+    const mouseY = e.clientY - rect.y
 
     if (!keysPressed.includes('Shift')) {
-      const position = { ...prevPosition, x: e.clientX, z: e.clientY }
+      const position = { ...prevPosition, x: mouseX, z: mouseY }
       setPosistions({ ...positions, [streamIdDragging]: position })
       throttled.current(streamIdDragging, position, streamIdDragging === localStream?.id)
       return
     }
 
-    const centerX = (prevPosition.x) + (TRIANGLE_SIZE / 2);
-    const centerZ = (prevPosition.z) + (TRIANGLE_SIZE / 2);
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-    const radians = Math.atan2(mouseX - centerX, mouseY - centerZ);
-    const deg = (radians * (180 / Math.PI) * -1) + 90;
+    const centerX = (prevPosition.x) + (TRIANGLE_SIZE / 2)
+    const centerZ = (prevPosition.z) + (TRIANGLE_SIZE / 2)
+
+    const radians = Math.atan2(mouseX - centerX, mouseY - centerZ)
+    const deg = (radians * (180 / Math.PI) * -1) + 90
     setPosistions({ ...positions, [streamIdDragging]: { ...prevPosition, deg: deg } })
   }
 
@@ -110,35 +118,42 @@ const App: React.FC<Props> = ({
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
     >
-      <h1 className={styles.title}>
-        Welcome to <a href="https://decentraland.org">Decentraland ZooMeets!</a>
-      </h1>
-      <div><Logo /></div>
-      <div className={styles.button}>
-        <Button>
-          {!localStream ? 'Loading...' : 'Listening'}
-        </Button>
-      </div>
-      <div>
-        { localStream && (
-          <Triangle
-            keysPressed={keysPressed}
-            onMouseDown={onMouseDown(localStream.id)}
-            position={positions[localStream.id]}
-            id={localStream.id}
+      <div className={styles.header}>
+        <SelectField
+          search={false}
+          value={currentRoom}
+          onChange={(_, data) => setCurrentRoom(data.value as string)}
+          label="Choose Room"
+          placeholder="Room"
+          options={[
+            { key: ROOM_1, text: ROOM_1, value: ROOM_1 },
+            { key: ROOM_2, text: ROOM_2, value: ROOM_2 },
+          ]}
           />
-        )}
-        {(remoteStreams || []).map(stream => (
-          <Triangle
-            keysPressed={keysPressed}
-            key={stream.id}
-            onMouseDown={onMouseDown(stream.id)}
-            position={positions[stream.id]}
-            id={stream.id}
-          />
-        ))}
+        <Logo />
       </div>
-      <CurrentGraph />
+      <div className={styles.graphs}>
+        <div ref={divRef}>
+          { localStream && (
+            <Triangle
+              keysPressed={keysPressed}
+              onMouseDown={onMouseDown(localStream.id)}
+              position={positions[localStream.id]}
+              id={localStream.id}
+            />
+          )}
+          {(remoteStreams || []).map(stream => (
+            <Triangle
+              keysPressed={keysPressed}
+              key={stream.id}
+              onMouseDown={onMouseDown(stream.id)}
+              position={positions[stream.id]}
+              id={stream.id}
+            />
+          ))}
+        </div>
+        <CurrentGraph />
+      </div>
     </div>
   )
 }

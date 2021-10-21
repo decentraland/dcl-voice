@@ -1,24 +1,29 @@
 import { select, call, put } from 'redux-saga/effects'
 
-import { getClient, getRoomId, getUserAddress } from '../selectors'
+import {
+  getClient,
+  GetContext,
+  getContext,
+  getRoomId,
+  getUserAddress
+} from '../selectors'
 import {
   JoinRoom,
   startLocalStream,
   VoiceInitialized,
   JOIN_ROOM
 } from '../actions'
+import { Client } from '../ion'
 
 export function* joinRoom(action: JoinRoom | VoiceInitialized) {
   const roomId: string =
     action.type === JOIN_ROOM
       ? action?.payload?.roomId
       : yield select(getRoomId)
-  const client: ReturnType<typeof getClient> = yield select(getClient)
+  const client: Client = yield select(getClient)
   const userAddress: ReturnType<typeof getUserAddress> = yield select(
     getUserAddress
   )
-
-  if (!client || !roomId) return
 
   client.leave()
   // TODO: ok, this is not working. Leave doesn't leave at all

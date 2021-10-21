@@ -299,7 +299,7 @@ export function Dot(props: { code: string }) {
       {error && <pre>{error}</pre>}
       <div style={{ display: 'flex' }}>
         <DownloadSvg dangerouslySetInnerHTML={{ __html: html }} />
-        <PositionalCanvas />
+        {/* <PositionalCanvas /> */}
       </div>
     </>
   );

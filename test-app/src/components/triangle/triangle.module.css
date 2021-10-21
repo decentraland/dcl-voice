@@ -2,7 +2,7 @@
   width: 20px;
   height: 20px;
   overflow: hidden;
-  position: fixed;
+  position: absolute;
   top: 0px;
   left: 0px;
   cursor: grab;
