@@ -41,7 +41,6 @@ export function listenDataChannel(channel: RTCDataChannel, log: string) {
   // TODO what about channel closed ?
   // Should we disconnect/close the connection and create a new one ?
   // This is something to be aware of when we write the tests.
-  console.log(log, 'Listen Data Channel')
   if (sendUserMessage) {
     sendUserMessage()
     sendUserMessage = undefined
@@ -59,7 +58,6 @@ export function listenDataChannel(channel: RTCDataChannel, log: string) {
 
   channel.onmessage = ({ data }) => {
     const message: Message = JSON.parse(data)
-    console.log(log, message)
     if (!_user || !validMessage(message)) return
 
     if (message.type === JOIN) {
@@ -71,7 +69,6 @@ export function listenDataChannel(channel: RTCDataChannel, log: string) {
   }
 
   channel.onopen = () => {
-    console.log(log, 'on open')
     // Sfu client only accepts ondatachannel to be initialized before joinRoom
     // And we dont have the streamId at that moment, so.......
     // We create a sendUserMessage that will be executed after getUserMedia is called

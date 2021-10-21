@@ -270,8 +270,6 @@ export function CurrentGraph() {
   ${edges.join('\n')}
 }`)
 
-    console.log({ graph })
-
   }, [graph])
 
   return <Dot code={graphCode} />
@@ -311,7 +309,6 @@ const canvasSize = 512
 const canvasHalfSize = 0
 
 function drawCanvas(ctx: CanvasRenderingContext2D, graph: Graph) {
-  console.log(graph)
   ctx.clearRect(0, 0, canvasSize, canvasSize)
   for (const node of Object.values(graph.nodes) as Iterable<AudioNode & BaseNode>) {
     if (node instanceof PannerNode) {

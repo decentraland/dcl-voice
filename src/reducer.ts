@@ -35,7 +35,6 @@ export function voiceReducer(
 ): State {
   switch (action.type) {
     case VOICE_INITIALIZED: {
-      console.log(action)
       return {
         ...state,
         // Reset values on reconnect.
@@ -49,7 +48,6 @@ export function voiceReducer(
     }
 
     case JOIN_ROOM: {
-      console.log(action)
       return {
         ...state,
         roomId: action.payload.roomId
@@ -57,7 +55,6 @@ export function voiceReducer(
     }
 
     case START_VOICE: {
-      console.log(action)
       return {
         ...state,
         config: { ...state.config, ...action.payload.config }
@@ -65,7 +62,6 @@ export function voiceReducer(
     }
 
     case RECONNECT_VOICE: {
-      console.log(action)
       return {
         ...state,
         reconnectTimes: state.reconnectTimes + 1
@@ -73,7 +69,6 @@ export function voiceReducer(
     }
 
     case SET_CONTEXT: {
-      console.log(action)
       return {
         ...state,
         context: { ...state.context, ...action.payload.context }
@@ -82,7 +77,6 @@ export function voiceReducer(
 
     case SET_ERROR: {
       console.error(action.payload.error)
-      console.log(action)
       return {
         ...state,
         error: action.payload.error
@@ -92,7 +86,6 @@ export function voiceReducer(
     case ADD_REMOTE_STREAM: {
       const { stream } = action.payload
       if (state.remoteStreams.find((s) => s.id === stream.id)) {
-        console.log(action)
         return {
           ...state,
           remoteStreams: state.remoteStreams.map((s) =>
@@ -101,7 +94,6 @@ export function voiceReducer(
         }
       }
 
-      console.log(action)
       return {
         ...state,
         remoteStreams: state.remoteStreams.concat(stream)
@@ -109,7 +101,6 @@ export function voiceReducer(
     }
 
     case REMOVE_REMOTE_STREAM: {
-      console.log(action)
       return {
         ...state,
         remoteStreams: state.remoteStreams.filter(
@@ -119,7 +110,6 @@ export function voiceReducer(
     }
 
     case SET_LOCAL_STREAM: {
-      console.log(action)
       return {
         ...state,
         localStream: action.payload.stream

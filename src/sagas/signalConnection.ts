@@ -44,7 +44,6 @@ function createSocketChannel(
     )
 
     client.ondatachannel = ({ channel }) => {
-      console.log({ channel })
       if (channel.label === 'data') {
         listenDataChannel(channel, 'onDataChannel')
       }
