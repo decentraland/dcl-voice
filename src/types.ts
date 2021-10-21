@@ -15,7 +15,7 @@ export type RemoteStreamWithPanner = {
 }
 
 export type VoiceState = {
-  context: Cache
+  context: Readonly<Cache>
   config: {
     url: string
     retryTimes: number

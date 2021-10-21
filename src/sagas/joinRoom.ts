@@ -1,12 +1,6 @@
 import { select, call, put } from 'redux-saga/effects'
 
-import {
-  getClient,
-  GetContext,
-  getContext,
-  getRoomId,
-  getUserAddress
-} from '../selectors'
+import { getClient, getRoomId, getUserAddress } from '../selectors'
 import {
   JoinRoom,
   startLocalStream,
@@ -24,10 +18,7 @@ export function* joinRoom(action: JoinRoom | VoiceInitialized) {
   const userAddress: ReturnType<typeof getUserAddress> = yield select(
     getUserAddress
   )
-
   client.leave()
-  // TODO: ok, this is not working. Leave doesn't leave at all
-  // And joining a new room throws an error
   try {
     yield call(() => client.join(roomId, userAddress))
 

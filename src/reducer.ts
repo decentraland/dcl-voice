@@ -11,10 +11,10 @@ import {
   VoiceActions,
   VOICE_INITIALIZED
 } from './actions'
-import { DEFAULT_CACHE as DEFAULT_CONTEXT } from './utils'
+import { cache, resetCache } from './utils'
 
 const VOICE_INITIAL_STATE: VoiceState = {
-  context: DEFAULT_CONTEXT,
+  context: cache,
   config: {
     pingInterval: 1000 * 60,
     retryTimes: 10,
@@ -35,6 +35,7 @@ export function voiceReducer(
 ): State {
   switch (action.type) {
     case VOICE_INITIALIZED: {
+      resetCache()
       return {
         ...state,
         // Reset values on reconnect.
@@ -44,7 +45,6 @@ export function voiceReducer(
         reconnectTimes: 0,
         remoteStreams: [],
         localStream: undefined,
-        context: DEFAULT_CONTEXT,
         error: undefined
       }
     }
