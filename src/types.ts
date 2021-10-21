@@ -1,5 +1,6 @@
 import { Client, LocalStream, RemoteStream } from './ion'
 import { IonSFUJSONRPCSignal } from './ion/signal/json-rpc-impl'
+import { Cache } from './utils'
 
 export type VoiceSpatialParams = {
   position: VoiceReadOnlyVector3
@@ -14,11 +15,14 @@ export type RemoteStreamWithPanner = {
 }
 
 export type VoiceState = {
+  context: Cache
   config: {
     url: string
     retryTimes: number
     pingInterval: number
+    userAddress: string
   }
+  roomId?: string
   error?: string
   connected: boolean
   client?: Client

@@ -1,21 +1,25 @@
 import { VoiceState } from './types'
 import {
   ADD_REMOTE_STREAM,
+  JOIN_ROOM,
   RECONNECT_VOICE,
   REMOVE_REMOTE_STREAM,
-  SET_CONFIG,
+  SET_CONTEXT,
   SET_ERROR,
   SET_LOCAL_STREAM,
   START_VOICE,
   VoiceActions,
   VOICE_INITIALIZED
 } from './actions'
+import { DEFAULT_CACHE as DEFAULT_CONTEXT } from './utils'
 
 const VOICE_INITIAL_STATE: VoiceState = {
+  context: DEFAULT_CONTEXT,
   config: {
     pingInterval: 1000 * 60,
     retryTimes: 10,
-    url: ''
+    url: '',
+    userAddress: ''
   },
   connected: false,
   remoteStreams: [],
@@ -33,12 +37,20 @@ export function voiceReducer(
     case VOICE_INITIALIZED: {
       return {
         ...state,
+        // Reset values on reconnect.
         client: action.payload.client,
         signal: action.payload.signal,
         connected: true,
         reconnectTimes: 0,
         remoteStreams: [],
         error: undefined
+      }
+    }
+
+    case JOIN_ROOM: {
+      return {
+        ...state,
+        roomId: action.payload.roomId
       }
     }
 
@@ -56,10 +68,10 @@ export function voiceReducer(
       }
     }
 
-    case SET_CONFIG: {
+    case SET_CONTEXT: {
       return {
         ...state,
-        config: { ...state.config, ...action.payload.config }
+        context: { ...state.context, ...action.payload.context }
       }
     }
 

@@ -1,41 +1,20 @@
-import { select } from 'redux-saga/effects'
+import { call, select } from 'redux-saga/effects'
 
 import { SetLocalPosition, SetStreamPosition } from '../actions'
-import { RemoteStreamWithPanner } from '../types'
-import { getContext, getValue } from '../utils'
-
-type Streams = Record<string, RemoteStreamWithPanner>
+import { getContext, GetContext } from '../selectors'
+import { updateStreamPosition, udpateLocalPosition } from '../position'
 
 export function* streamPosition(action: SetStreamPosition) {
-  const streams: Streams = yield select(() => getValue('streams'))
+  const { streams }: GetContext = yield select(getContext)
   const stream = streams[action.payload.streamId]
-
-  if (stream.panner) {
-    // even thouth setPosition and setOrientation are deprecated, that
-    // is the only way to set positions in Firefox and Safari
-    const { x, y, z } = action.payload.position
-    stream.panner.setPosition(x, y, z)
-    stream.panner.setOrientation(
-      action.payload.position.x,
-      action.payload.position.y,
-      action.payload.position.z
-    )
+  if (stream) {
+    yield call(() => updateStreamPosition(stream, action.payload.position))
   }
 }
 
 export function* localStreamPosition(action: SetLocalPosition) {
-  const context: AudioContext = yield select(getContext)
-
-  // even thouth setPosition and setOrientation are deprecated, that
-  // is the only way to set positions in Firefox and Safari
-  const { x, y, z } = action.payload.position
-  context.listener.setPosition(x, y, z)
-  context.listener.setOrientation(
-    action.payload.position.x,
-    action.payload.position.y,
-    action.payload.position.z,
-    0,
-    1,
-    0
-  )
+  const { audioContext }: GetContext = yield select(getContext)
+  if (audioContext) {
+    yield call(() => udpateLocalPosition(audioContext, action.payload.position))
+  }
 }

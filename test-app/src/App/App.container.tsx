@@ -29,7 +29,7 @@ const mapState = (state: RootState): MapStateProps => {
 const mapDispatch = (dispatch: Dispatch<AnyAction>): MapDispatchProps => ({
   onStartLocalStream: () => dispatch(startLocalStream()),
   onStartVoice: (config) => dispatch(startVoice(config)),
-  onJoinRoom: (roomId, userId) => dispatch(joinRoom(roomId, userId)),
+  onJoinRoom: (roomId) => dispatch(joinRoom(roomId)),
   onSetLocalPosition: (position, _pos) => dispatch(setLocalPosition(position, position)),
   onSetStreamPosition: (streamId, position) => dispatch(setStreamPosition(streamId, position))
 })
