@@ -12,18 +12,19 @@ export type Cache = {
   audio: HTMLAudioElement | undefined
 }
 
-export const DEFAULT_CACHE: () => Cache = () => ({
-  audioContext: undefined,
-  streams: {},
-  mapping: {},
-  destination: undefined,
-  audio: undefined
-})
-
-export const cache: Cache = DEFAULT_CACHE()
+export function getDefaultCache() {
+  return {
+    audioContext: undefined,
+    streams: {},
+    mapping: {},
+    destination: undefined,
+    audio: undefined
+  }
+}
+export const cache: Cache = getDefaultCache()
 
 export const resetCache = () => {
-  const defaultCache = DEFAULT_CACHE()
+  const defaultCache = getDefaultCache()
   const entries = Object.entries(defaultCache)
   entries.forEach(([key, value]) => {
     ;(cache as any)[key] = value

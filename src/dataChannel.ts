@@ -1,6 +1,6 @@
 import { action } from 'typesafe-actions'
 
-import { setValue2 } from './utils'
+import { setValue2, cache } from './utils'
 
 // Messages that are sent via this channel.
 // Every time we receive a join, we send a response saying who we are.
@@ -66,6 +66,7 @@ export function listenDataChannel(channel: RTCDataChannel, log: string) {
 
     // Add usserAddress: streamId to our internal map
     setValue2('mapping', message.payload.id, message.payload.streamId)
+    console.log(cache['mapping'])
   }
 
   channel.onopen = () => {

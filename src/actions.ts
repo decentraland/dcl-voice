@@ -23,11 +23,6 @@ export const setConfig = (config: Partial<VoiceState['config']>) =>
   action(SET_CONFIG, { config })
 export type SetConfig = ReturnType<typeof setConfig>
 
-export const SET_CONTEXT = 'Voice set context'
-export const setContext = (context: Partial<VoiceState['context']>) =>
-  action(SET_CONTEXT, { context })
-export type SetContext = ReturnType<typeof setContext>
-
 export const SET_ERROR = 'Voice error'
 export const setError = (error: string) => action(SET_ERROR, { error })
 export type SetError = ReturnType<typeof setError>
@@ -74,7 +69,6 @@ export type VoiceActions =
   | StartVoice
   | VoiceInitialized
   | SetConfig
-  | SetContext
   | SetError
   | ReconnectVoice
   | JoinRoom

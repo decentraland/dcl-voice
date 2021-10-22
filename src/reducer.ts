@@ -4,7 +4,6 @@ import {
   JOIN_ROOM,
   RECONNECT_VOICE,
   REMOVE_REMOTE_STREAM,
-  SET_CONTEXT,
   SET_ERROR,
   SET_LOCAL_STREAM,
   START_VOICE,
@@ -27,14 +26,14 @@ const VOICE_INITIAL_STATE: VoiceState = {
   reconnectTimes: 0
 }
 
-type State = VoiceState
-
+// ⚠️⚠️ DO NOT UPDATE CONTEXT PROP.
 export function voiceReducer(
   state: VoiceState = VOICE_INITIAL_STATE,
   action: VoiceActions
-): State {
+): VoiceState {
   switch (action.type) {
     case VOICE_INITIALIZED: {
+      console.log(action)
       resetCache()
       return {
         ...state,
@@ -50,6 +49,7 @@ export function voiceReducer(
     }
 
     case JOIN_ROOM: {
+      console.log(action)
       return {
         ...state,
         roomId: action.payload.roomId
@@ -57,6 +57,7 @@ export function voiceReducer(
     }
 
     case START_VOICE: {
+      console.log(action)
       return {
         ...state,
         config: { ...state.config, ...action.payload.config }
@@ -64,20 +65,15 @@ export function voiceReducer(
     }
 
     case RECONNECT_VOICE: {
+      console.log(action)
       return {
         ...state,
         reconnectTimes: state.reconnectTimes + 1
       }
     }
 
-    case SET_CONTEXT: {
-      return {
-        ...state,
-        context: { ...state.context, ...action.payload.context }
-      }
-    }
-
     case SET_ERROR: {
+      console.log(action)
       console.error(action.payload.error)
       return {
         ...state,
@@ -86,6 +82,7 @@ export function voiceReducer(
     }
 
     case ADD_REMOTE_STREAM: {
+      console.log(action)
       const { stream } = action.payload
       if (state.remoteStreams.find((s) => s.id === stream.id)) {
         return {
@@ -103,6 +100,7 @@ export function voiceReducer(
     }
 
     case REMOVE_REMOTE_STREAM: {
+      console.log(action)
       return {
         ...state,
         remoteStreams: state.remoteStreams.filter(
@@ -112,6 +110,7 @@ export function voiceReducer(
     }
 
     case SET_LOCAL_STREAM: {
+      console.log(action)
       return {
         ...state,
         localStream: action.payload.stream
