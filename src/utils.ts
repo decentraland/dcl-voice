@@ -31,6 +31,10 @@ export const resetCache = () => {
   })
 }
 
+export function getAudioContext() {
+  return cache['audioContext']
+}
+
 export function setValue<T extends keyof Cache>(
   key: T,
   value: NonNullable<Cache[T]>
@@ -65,4 +69,10 @@ export function createAudio(): HTMLAudioElement {
 
 export function isChrome() {
   return window.navigator.userAgent.includes('Chrome')
+}
+
+export function getStreamByAddress(address: string) {
+  const streamId = cache['mapping'][address]
+  if (!streamId) return
+  return cache['streams'][streamId]
 }

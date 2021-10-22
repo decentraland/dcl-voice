@@ -3,8 +3,8 @@ import { IonSFUJSONRPCSignal } from './ion/signal/json-rpc-impl'
 import { Cache } from './utils'
 
 export type VoiceSpatialParams = {
-  position: VoiceReadOnlyVector3
-  orientation: VoiceReadOnlyVector3
+  position: [number, number, number]
+  orientation: [number, number, number]
 }
 
 export type RemoteStreamWithPanner = {
