@@ -60,23 +60,24 @@ export function addConnection(N: number) {
       const possibleFrecuencies = [130,155,196,233, 329]
       const f = possibleFrecuencies[Math.round(Math.random() * (possibleFrecuencies.length-1))];
 
-      const interval = setInterval(() => {
-        samples.forEach((value, index) => {
-          // Sin
-          t+= 1/8000
-          samples[index] = 1000 * Math.sin(2*3.1416*f*t) //*Math.round(Math.random() * 1000)
+      samples.forEach((value, index) => {
+        // Sin
+        t+= 1/8000
+        samples[index] = 1000 * Math.sin(2*3.1416*f*t) //*Math.round(Math.random() * 1000)
 
-          // Noise
-          // samples[index] = Math.round(Math.random() * 1000)
-        })
+        // Noise
+        // samples[index] = Math.round(Math.random() * 1000)
+      })
+      const data = {
+        samples,
+        sampleRate
+      }
+
+      const interval = setInterval(() => {
           
-        const data = {
-          samples,
-          sampleRate
-        }
 
         source.onData(data)
-      }, 10)
+      })
 
       mediaStream.addTrack(track)
       client.publish(mediaStream as any)
