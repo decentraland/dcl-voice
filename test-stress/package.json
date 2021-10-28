@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc -p tsconfig.json -w",
+    "start": "node dist/test-stress/index.js"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +16,8 @@
     "ts-node": "^10.4.0",
     "wrtc": "^0.4.7",
     "ws": "^8.2.3"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.2.0"
   }
 }

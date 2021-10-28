@@ -1,9 +1,7 @@
 
-/// <reference path="node_modules/@types/webrtc/RTCPeerConnection.d.ts" />
-/// <reference path="node_modules/@types/webrtc/MediaStream.d.ts" />
 
-
-import { Client } from "./../src/ion";
+import { Stream } from "stream";
+import { Client, LocalStream } from "./../src/ion";
 import { IonSFUJSONRPCSignal } from "./../src/ion/signal/json-rpc-impl";
 // var uuid = require("uuid");
 
@@ -32,12 +30,26 @@ export function addConnection(N: number) {
       setInterval(() => signal.notify("", ""), 1000 * 60);
 
       const u = Math.round(Math.random() * 100000).toString()
-      await client.join("boedo", u);
+      await client.join("Room: Casla", u);
       clientJoined++;
       console.log(`#${N} joined - total ${clientJoined}`);
       joins[N] = true;
+      const options = {
+        resolution: 'hd',
+        audio: true,
+        codec: 'vp8',
+        video: false,
+        simulcast: true,
+        sendEmptyOnMute: true,
+        advanced: [
+          { echoCancellation: true },
+          { autoGainControl: true },
+          { noiseSuppression: true }
+        ]
+      } as const
 
-      const mediaStream = new MediaStream();
+      const stream = new MediaStream()
+      const mediaStream = new LocalStream(stream, options);
       client.publish(mediaStream as any)
 
       // create a datachannel
