@@ -18,11 +18,11 @@ import { addConnection } from './connection'
 import { cache } from '../src/utils'
 
 (async () => {
-  const maxPeer = 5
+  const maxPeer = 10
 
   const promises = Array
     .from({ length: maxPeer })
-    .map((_, index) => addConnection(`${index}`))
+    .map((_, index) => addConnection(`${index}${Math.random()}`))
 
   await Promise.all(promises)
 

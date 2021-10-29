@@ -39,7 +39,7 @@ export function mockStream() {
 
   setInterval(() => {
     source.onData(data)
-  })
+  }, 10)
 
   mediaStream.addTrack(track)
   return mediaStream
