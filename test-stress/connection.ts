@@ -1,101 +1,49 @@
-import { Stream } from 'stream'
-import { Client, LocalStream } from './../src/ion'
+import { Client } from './../src/ion'
 import { IonSFUJSONRPCSignal } from './../src/ion/signal/json-rpc-impl'
-// var uuid = require("uuid");
+import { mockStream } from './mockStream'
+import { listenDataChannel, setUser } from '../src/dataChannel'
 
-let signalConnected = 0
-let dataChannelsConnected = 0
-let clientJoined = 0
-let joins: Record<string, boolean> = {}
+const joins: Record<string, boolean> = {}
 
-export function addConnection(N: number) {
-  return new Promise((resolve) => {
+function totalConnected() {
+  return Object.values(joins).filter(a => !!a).length
+}
+
+export function addConnection(id: string) {
+  return new Promise<void>((resolve) => {
     const signal = new IonSFUJSONRPCSignal(
       'wss://test-sfu.decentraland.zone/ws'
-    )
-    const client = new Client(signal)
-
-    signal.onclose = async () => {
-      console.log(`#${N} disconnected - total ${signalConnected--}`)
-      if (joins[N]) clientJoined--
-    }
-
-    signal.onopen = async () => {
-      console.log(
-        `#${N} connected - total ${signalConnected++}` // (joined ${clientJoined} - datachhanels ${dataChannelsConnected})`
       )
+      const client = new Client(signal)
 
-      setInterval(() => signal.notify('', ''), 1000 * 60)
-
-      const u = Math.round(Math.random() * 100000).toString()
-      await client.join('Room: Casla', u)
-      clientJoined++
-      console.log(`#${N} joined - total ${clientJoined}`)
-      joins[N] = true
-      const options = {
-        resolution: 'hd',
-        audio: true,
-        codec: 'vp8',
-        video: false,
-        simulcast: true,
-        sendEmptyOnMute: true,
-        advanced: [
-          { echoCancellation: true },
-          { autoGainControl: true },
-          { noiseSuppression: true }
-        ]
-      } as const
-
-      const stream = new MediaStream()
-      const mediaStream = new LocalStream(stream, options)
-
-      const { RTCAudioSource } = require('wrtc').nonstandard
-
-      const source = new RTCAudioSource()
-      const track = source.createTrack()
-
-      const sampleRate = 8000
-      const samples = new Int16Array(sampleRate / 100) // 10 ms of 16-bit mono audio
-      let t = 0.0;
-      const possibleFrecuencies = [130,155,196,233, 329]
-      const f = possibleFrecuencies[Math.round(Math.random() * (possibleFrecuencies.length-1))];
-
-      samples.forEach((value, index) => {
-        // Sin
-        t+= 1/8000
-        samples[index] = 1000 * Math.sin(2*3.1416*f*t) //*Math.round(Math.random() * 1000)
-
-        // Noise
-        // samples[index] = Math.round(Math.random() * 1000)
-      })
-      const data = {
-        samples,
-        sampleRate
-      }
-
-      const interval = setInterval(() => {
-          
-
-        source.onData(data)
-      })
-
-      mediaStream.addTrack(track)
-      client.publish(mediaStream as any)
-
-      // create a datachannel
-      const dc = client.createDataChannel('data')
-      dc.onopen = async () => {
-        console.log(
-          `#${N} data channel connected - total ${dataChannelsConnected++}`
-        )
-
-        while (1) {
-          dc.send('TEST STRING')
-          await new Promise((resolve) => setTimeout(resolve, 10))
+      client.ondatachannel = ({ channel }) => {
+        if (channel.label === 'data') {
+          listenDataChannel(channel, 'onDataChannel')
         }
       }
 
-      resolve(null)
-    }
-  })
-}
+      signal.onclose = async () => {
+        console.log(`#${id} disconnected - total ${totalConnected()}`)
+        joins[id] = false
+      }
+
+      signal.onopen = async () => {
+        // Keep alive connetion
+        setInterval(() => signal.notify('', ''), 1000 * 60)
+
+        await client.join('Room: Casla', id)
+        joins[id] = true
+        console.log(`#${id} joined - total ${totalConnected()}`)
+
+        // Create local media stream
+        const mediaStream = mockStream()
+        client.publish(mediaStream as any)
+        setUser({ id, streamId: mediaStream.id })
+
+        // create a datachannel
+        const dc = client.createDataChannel('data')
+        listenDataChannel(dc, 'createDataChannel')
+        resolve()
+      }
+    })
+  }
