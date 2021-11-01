@@ -1,7 +1,6 @@
 import WebSocket from 'ws'
 import { MediaStream, RTCPeerConnection } from 'wrtc'
 
-
 // Mocking global vars that ion-sfu uses.
 ;(globalThis as any).window = {
   AudioContext: () => {}
@@ -16,18 +15,27 @@ import { MediaStream, RTCPeerConnection } from 'wrtc'
 
 import { addConnection } from './connection'
 import { cache } from '../src/utils'
+;(async () => {
+  const maxPeer = 50
 
-(async () => {
-  const maxPeer = 10
-
-  const promises = Array
-    .from({ length: maxPeer })
-    .map((_, index) => addConnection(`${index}${Math.random()}`))
-
-  await Promise.all(promises)
-
-  setTimeout(
-    () => console.log(cache['mapping']),
-    1000 * 5
+  const promises = Array.from({ length: maxPeer }).map((_, index) =>
+    addConnection(`${index}${Math.random()}`)
   )
+
+  const peers = await Promise.all(promises)
+
+  let talkingIndex = 0
+
+  const talk = async () => {
+    console.log({talkingIndex})
+    peers[talkingIndex].silence()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    talkingIndex = (talkingIndex + 1) % maxPeer
+    peers[talkingIndex].noise()
+
+    setTimeout(talk, 5000)
+  }
+  talk();
+
+  setTimeout(() => console.log(cache['mapping']), 1000 * 5)
 })()

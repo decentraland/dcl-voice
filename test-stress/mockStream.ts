@@ -6,7 +6,7 @@ const options = {
   codec: 'vp8',
   video: false,
   simulcast: true,
-  sendEmptyOnMute: true,
+  sendEmptyOnMute: true
 } as const
 
 export function mockStream() {
@@ -20,27 +20,48 @@ export function mockStream() {
 
   const sampleRate = 8000
   const samples = new Int16Array(sampleRate / 100) // 10 ms of 16-bit mono audio
-  let t = 0.0;
+
+  let t = 0.0
   const possibleFrecuencies = [130, 155, 196, 233, 329]
-  const f = possibleFrecuencies[Math.round(Math.random() * (possibleFrecuencies.length - 1))];
+  const f =
+    possibleFrecuencies[
+      Math.round(Math.random() * (possibleFrecuencies.length - 1))
+    ]
 
-  samples.forEach((value, index) => {
-    // Sin
-    t+= 1/8000
-    samples[index] = 1000 * Math.sin(2*3.1416*f*t) //*Math.round(Math.random() * 1000)
+  let interval: NodeJS.Timeout
 
-    // Noise
-    // samples[index] = Math.round(Math.random() * 1000)
-  })
-  const data = {
-    samples,
-    sampleRate
+  const silence = () => {
+    clearInterval(interval)
+
+    samples.forEach((value, index) => {
+      samples[index] = 0
+    })
+
+    const data = {
+      samples,
+      sampleRate
+    }
+    source.onData(data)
   }
 
-  setInterval(() => {
-    source.onData(data)
-  }, 10)
+  const noise = () => {
+    samples.forEach((value, index) => {
+      samples[index] = Math.round(Math.random() * 40000) - 20000
+    })
+
+    interval = setInterval(() => {
+      const data = {
+        samples,
+        sampleRate
+      }
+      source.onData(data)
+    }, 10)
+  }
 
   mediaStream.addTrack(track)
-  return mediaStream
+  return {
+    mediaStream,
+    silence,
+    noise
+  }
 }
