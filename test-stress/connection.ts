@@ -22,11 +22,8 @@ export function addConnection(id: string) {
       }
     }
 
-    client.onactivelayer = (al) => {
-      console.log({ al })
-    }
     client.onspeaker = (spk) => {
-      console.log({ spk })
+      // console.log({ spk })
     }
 
     signal.onclose = async () => {
@@ -41,13 +38,16 @@ export function addConnection(id: string) {
       const roomId = process.env['ROOM'] || 'Room: Casla'
       await client.join(roomId, id)
       joins[id] = true
-      console.log(`#${id} joined - total ${totalConnected()}`)
+      console.log(`#${id} joined - total ${totalConnected()} - '${roomId}'`)
 
       // Create local media stream
       const { mediaStream, silence, noise } = mockStream()
 
+      noise()
+      
       client.publish(mediaStream as any)
       setUser({ id, streamId: mediaStream.id })
+
 
       // create a datachannel
       const dc = client.createDataChannel('data')

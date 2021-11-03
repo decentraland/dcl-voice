@@ -16,26 +16,30 @@ import { MediaStream, RTCPeerConnection } from 'wrtc'
 import { addConnection } from './connection'
 import { cache } from '../src/utils'
 ;(async () => {
-  const maxPeer = 50
+  const maxPeer = 10
 
-  const promises = Array.from({ length: maxPeer }).map((_, index) =>
-    addConnection(`${index}${Math.random()}`)
+  const promises = Array.from({ length: maxPeer }).map(
+    (_, index) => () => addConnection(`${index}${Math.random()}`)
   )
 
-  const peers = await Promise.all(promises)
+  let promisesPeers: Promise<any>[] = []
+  for (const p of promises) {
+    promisesPeers.push(p())
+    // await new Promise((resolve) => setTimeout(resolve, 100))
+  }
 
+  const peers = await Promise.all(promisesPeers)
+  console.log({peers})
   let talkingIndex = 0
-
   const talk = async () => {
-    console.log({talkingIndex})
+    console.log({ talkingIndex })
     peers[talkingIndex].silence()
     await new Promise((resolve) => setTimeout(resolve, 500))
     talkingIndex = (talkingIndex + 1) % maxPeer
     peers[talkingIndex].noise()
-
-    setTimeout(talk, 5000)
+    setTimeout(talk, 2000)
   }
-  talk();
+  talk()
 
   setTimeout(() => console.log(cache['mapping']), 1000 * 5)
 })()
