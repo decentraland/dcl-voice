@@ -9,8 +9,13 @@ function totalConnected() {
   return Object.values(joins).filter((a) => !!a).length
 }
 
+export type Response = {
+  silence: () => void
+  noise: () => void
+}
+
 export function addConnection(id: string) {
-  return new Promise<any>((resolve) => {
+  return new Promise<Response>((resolve) => {
     const signal = new IonSFUJSONRPCSignal(
       'wss://test-sfu.decentraland.zone/ws'
     )
@@ -42,13 +47,12 @@ export function addConnection(id: string) {
 
       // Create local media stream
       const { mediaStream, silence, noise } = mockStream()
-
       noise()
-      
+
       client.publish(mediaStream as any)
       setUser({ id, streamId: mediaStream.id })
 
-
+      setTimeout(() => silence(), 3000)
       // create a datachannel
       const dc = client.createDataChannel('data')
       listenDataChannel(dc, 'createDataChannel')

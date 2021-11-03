@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -p tsconfig.json -w",
-    "start": "node dist/test-stress/index.js"
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && node dist/test-stress/index.js"
   },
   "keywords": [],
   "author": "",
