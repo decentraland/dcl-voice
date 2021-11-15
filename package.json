@@ -20,7 +20,7 @@
     "url": "https://github.com/decentraland/dcl-voice/issues"
   },
   "engines": {
-    "node": ">=15",
+    "node": ">=15.0.0",
     "npm": ">=7.0.0"
   },
   "prettier": {
