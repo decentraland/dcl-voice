@@ -3,3 +3,4 @@ dist
 test-app/build
 **/*.d.ts
 src/ion
+test-stress/
