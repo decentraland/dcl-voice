@@ -35,7 +35,7 @@
     "@types/node": "^10.17.13",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
-    "concurrently": "^6.3.0",
+    "concurrently": "^7.6.0",
     "dcl-tslint-config-standard": "^3.0.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
