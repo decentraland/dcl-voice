@@ -16,6 +16,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: (Experimental) Log
+        run: |
+          echo "run from a PR"
+          echo "from tag '${{env.BRANCH_TAG}}'"
+          echo "- env '${{github.head_ref}}'"
       - uses: actions/checkout@master
       - name: Use Node.js 20
         uses: actions/setup-node@v1
