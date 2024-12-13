@@ -1,7 +1,7 @@
 {
   "name": "@dcl/voice",
   "version": "1.0.0",
-  "description": "Voice WebRTC sfu sagas",
+  "description": "Voice WebRTC sfu sagas.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {},
