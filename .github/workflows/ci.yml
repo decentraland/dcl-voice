@@ -7,16 +7,19 @@ on:
     types:
       - created
 
+env:
+  BRANCH_TAG: ${{ github.head_ref == 'experimental' && 'experimental' || '' }}
+
 name: CI
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Use Node.js 16.x
+      - name: Use Node.js 20
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 16
       - name: make install
         run:  make install
       - name: lint
@@ -28,5 +31,8 @@ jobs:
         with:
           registry-url: "https://registry.npmjs.org"
           access: public
+          custom-tag: ${{ env.BRANCH_TAG }}
+          branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref }}
