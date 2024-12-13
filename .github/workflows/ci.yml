@@ -9,7 +9,7 @@ on:
       - created
 
 env:
-  BRANCH_TAG: ${{ github.head_ref == 'experimental' && 'experimental' || '' }}
+  BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || '' }}
 
 name: CI
 jobs:
@@ -20,7 +20,7 @@ jobs:
         run: |
           echo "run from a PR"
           echo "from tag '${{env.BRANCH_TAG}}'"
-          echo "- env '${{github.head_ref}}'"
+          echo "- env '${{github.ref_name}}'"
       - uses: actions/checkout@master
       - name: Use Node.js 20
         uses: actions/setup-node@v1
@@ -41,4 +41,4 @@ jobs:
           branch-to-custom-tag: ${{ env.BRANCH_TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.ref_name }}
